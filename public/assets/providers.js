@@ -150,7 +150,10 @@ export async function liteHotels(env, q) {
 }
 
 /* ---------------- Sample data (no keys) ---------------- */
-const hash = (s) => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return (h >>> 0) / 4294967295; };
+const hash = (s) => { // FNV-1a plus a final avalanche so similar inputs give very different values
+  let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); }
+  h ^= h >>> 16; h = Math.imul(h, 0x85ebca6b); h ^= h >>> 13; h = Math.imul(h, 0xc2b2ae35); h ^= h >>> 16;
+  return (h >>> 0) / 4294967295; };
 const CABIN_MULT = {economy: 1, premium: 2.2, business: 4.6, first: 7.5};
 const DOW = [1.06, 0.98, 0.93, 0.95, 1.04, 1.08, 1.02]; // Sun..Sat: midweek tends to be cheaper
 function baseFare(from, to, region) {
