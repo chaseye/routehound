@@ -1,9 +1,10 @@
 /* GET /api/hotels?city=Seoul&country=KR&checkin=2027-01-09&checkout=2027-01-13&adults=1[&max=150][&sort=price|rating]
  * Available stays with prices for the dates: Google Hotels (prices across booking sites) and LiteAPI (live room rates). */
-import {serpHotels, liteHotels, demoHotels, cached, json, has, okDate} from '../../public/assets/providers.js';
+import {serpHotels, liteHotels, demoHotels, cached, json, has, okDate, normEnv} from '../../public/assets/providers.js';
 
 export async function onRequestGet(context) {
-  const {request, env} = context;
+  const {request} = context;
+  const env = normEnv(context.env);
   const u = new URL(request.url);
   const q = {city: (u.searchParams.get('city') || '').slice(0, 60), country: (u.searchParams.get('country') || '').toUpperCase().slice(0, 2),
     checkin: u.searchParams.get('checkin'), checkout: u.searchParams.get('checkout'), adults: Math.min(9, Math.max(1, +u.searchParams.get('adults') || 1)),

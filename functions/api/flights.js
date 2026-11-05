@@ -1,9 +1,10 @@
 /* GET /api/flights?from=ORD&to=ICN&date=2027-01-08&cabin=business[&ret=2027-01-24][&adults=1][&long=1]
  * Live offers from Duffel and Google Flights (SerpApi), merged and sorted by price. Sample data when no keys are set. */
-import {duffelFlights, serpFlights, demoFlights, cached, json, has, okCode, okDate, bookLink, parseMulti} from '../../public/assets/providers.js';
+import {duffelFlights, serpFlights, demoFlights, cached, json, has, okCode, okDate, bookLink, parseMulti, normEnv} from '../../public/assets/providers.js';
 
 export async function onRequestGet(context) {
-  const {request, env} = context;
+  const {request} = context;
+  const env = normEnv(context.env);
   const u = new URL(request.url);
   const q = {from: (u.searchParams.get('from') || '').toUpperCase(), to: (u.searchParams.get('to') || '').toUpperCase(),
     date: u.searchParams.get('date'), ret: u.searchParams.get('ret') || null, cabin: u.searchParams.get('cabin') || 'economy',

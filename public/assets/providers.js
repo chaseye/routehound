@@ -234,5 +234,16 @@ export async function cached(request, ctx, ttl, make) {
   return res;
 }
 export const has = (env, k) => !!(env && env[k]);
+/* Accept key names in any case or spacing (SerpAPI_Key, serpapi-key, SERPAPI_KEY ...). */
+const CANON = ['DUFFEL_TOKEN', 'SERPAPI_KEY', 'TRAVELPAYOUTS_TOKEN', 'LITEAPI_KEY'];
+const squash = (k) => k.toUpperCase().replace(/[^A-Z0-9]/g, '');
+export function normEnv(env = {}) {
+  const out = {...env};
+  for (const k of Object.keys(env)) {
+    const c = CANON.find((n) => squash(n) === squash(k));
+    if (c && !out[c] && typeof env[k] === 'string') out[c] = env[k].trim();
+  }
+  return out;
+}
 export const okCode = (s) => /^[A-Z]{3}$/.test(s || '');
 export const okDate = (s) => /^\d{4}-\d{2}-\d{2}$/.test(s || '');

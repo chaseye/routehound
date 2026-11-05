@@ -1,9 +1,10 @@
 /* GET /api/hotel-prices?token=<property_token>&name=...&checkin=...&checkout=...&adults=1
  * One hotel's price on every booking site for the dates, cheapest first, with room options. */
-import {serpHotelPrices, cached, json, has, okDate} from '../../public/assets/providers.js';
+import {serpHotelPrices, cached, json, has, okDate, normEnv} from '../../public/assets/providers.js';
 
 export async function onRequestGet(context) {
-  const {request, env} = context;
+  const {request} = context;
+  const env = normEnv(context.env);
   const u = new URL(request.url);
   const q = {token: u.searchParams.get('token') || '', name: (u.searchParams.get('name') || '').slice(0, 120),
     checkin: u.searchParams.get('checkin'), checkout: u.searchParams.get('checkout'), adults: Math.min(9, Math.max(1, +u.searchParams.get('adults') || 1))};
