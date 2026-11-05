@@ -1,7 +1,7 @@
 /* POST /api/track/run  (Authorization: Bearer <TRACK_SECRET>)
  * Re-prices the saved trips checked longest ago and emails users when a price drops.
  * Called by the scheduled GitHub Action. Each run handles up to `limit` trips (default 8). */
-import {db, jsonRes, sendEmail, emailLayout, esc} from '../../../lib/server.js';
+import {db, jsonRes, sendEmail, emailLayout, esc, addUsage} from '../../../lib/server.js';
 import {priceTrip} from '../../../lib/track.js';
 
 const usd = (v) => '$' + Math.round(v).toLocaleString('en-US');
@@ -36,6 +36,7 @@ export async function onRequestPost({request, env}) {
   for (const {trip, trips} of groups.values()) {
     if (lookups >= limit) break;
     lookups++;
+    await addUsage(DB, 'live_checks', 1);
     let p = null;
     try { p = await priceTrip(env, trip); } catch (e) { report.push({trips: trips.length, error: String(e.message || e)}); continue; }
     if (!p) { report.push({trips: trips.length, skipped: 'no price'}); continue; }

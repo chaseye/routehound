@@ -11,3 +11,11 @@ EMAIL_FROM=RouteHound <alerts@yourdomain.com>
 TRACK_SECRET=any-long-random-string
 # Local testing only: print emails to the console instead of sending (never set in production)
 # DEV_EMAIL_LOG=1
+
+# Earnings tracking
+ADMIN_EMAILS=you@example.com
+POSTBACK_KEY=another-long-random-string
+# Affiliate IDs (JSON, one line). Partner ids are listed in lib/partners.js.
+# AFFILIATE_IDS={"booking":{"aid":"1234567"},"kayak":{"template":"https://www.anrdoezrs.net/links/PID/type/dlg/sid/{click}/{url}"}}
+# COST_PER_LOOKUP=0.025
+# COST_PER_EMAIL=0

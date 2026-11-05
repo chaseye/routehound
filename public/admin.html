@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>RouteHound Earnings</title>
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .adm{padding-block:24px 64px;display:grid;gap:22px}
+  .adm-h{display:flex;flex-wrap:wrap;gap:12px;align-items:end;justify-content:space-between}
+  .adm-h form{display:flex;gap:8px;flex-wrap:wrap;align-items:end}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:12px}
+  .tile{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+  .tile .big{font-family:var(--f-display);font-size:1.6rem;font-weight:800;font-variant-numeric:tabular-nums}
+  .neg{color:#c0392b} @media (prefers-color-scheme:dark){.neg{color:#ff8a7a}}
+  .scroll{overflow-x:auto} .tbl td.num,.tbl th.num{text-align:right;font-variant-numeric:tabular-nums}
+  .flag{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}
+  .flag:first-child{border-top:0}
+  .flag b{flex:none;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;padding:2px 8px;border-radius:999px;background:var(--chip)}
+  .flag b.money{background:var(--accent);color:var(--accent-ink)} .flag b.dispute{background:var(--warn);color:var(--bg)}
+  textarea{width:100%;min-height:8rem;font-family:var(--f-code);font-size:.8rem}
+  .two{display:grid;grid-template-columns:repeat(auto-fit,minmax(18rem,1fr));gap:18px}
+  label{display:grid;gap:4px;font-size:.88rem}
+  .adm .two .tbl{min-width:0;width:100%} .adm .card{min-width:0}
+  .costf{display:grid;grid-template-columns:1fr 1.4fr 1fr auto;gap:8px;align-items:end;margin-bottom:10px}
+  @media (max-width:560px){.costf{grid-template-columns:1fr 1fr}.adm-h form{width:100%}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap"><a class="brand" href="/"><b>RouteHound</b></a><span class="pill">Earnings &amp; costs</span></div></header>
+<main class="wrap adm" id="app"><p class="muted">Loading…</p></main>
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const usd = (v) => v == null ? '—' : (v < 0 ? '−$' : '$') + Math.abs(v).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const pct = (v) => v == null ? '—' : (v * 100).toFixed(1) + '%';
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+const json = async (url, opt) => { const r = await fetch(url, opt); const b = await r.json().catch(() => ({})); if (!r.ok) throw Object.assign(new Error(b.error || r.status), {status: r.status}); return b; };
+let range = {from: '', to: ''};
+
+async function load() {
+  const app = $('#app');
+  let d;
+  try { d = await json(`/api/admin/report?from=${range.from}&to=${range.to}`); }
+  catch (e) {
+    app.innerHTML = e.status === 403 ? '<div class="card"><h2>Admins only</h2><p class="muted">Sign in on the <a href="/#account">account page</a> with an email listed in ADMIN_EMAILS.</p></div>'
+      : `<div class="card"><h2>Not available</h2><p class="muted">${esc(e.message)}</p></div>`;
+    return;
+  }
+  range = {from: d.from, to: d.to};
+  const m = d.money, t = d.totals;
+  const q = (k, extra = '') => `/api/admin/export?kind=${k}&from=${d.from}&to=${d.to}${extra}`;
+  app.innerHTML = `
+  <div class="adm-h"><div><h2>Earnings &amp; costs</h2><p class="muted small">${esc(d.from)} to ${esc(d.to)}. Bot clicks (${t.bots}) are excluded.</p></div>
+    <form id="rng"><label>From<input type="date" name="from" value="${esc(d.from)}"></label><label>To<input type="date" name="to" value="${esc(d.to)}"></label><button>Update</button></form></div>
+  <div class="tiles">
+    <div class="tile"><span class="lbl">Confirmed commission</span><div class="big">${usd(m.confirmed)}</div><span class="muted small">approved ${usd(m.approved)} · paid ${usd(m.paid)}</span></div>
+    <div class="tile"><span class="lbl">Pending</span><div class="big">${usd(m.pending)}</div><span class="muted small">reversed ${usd(m.reversed)}</span></div>
+    <div class="tile"><span class="lbl">Costs</span><div class="big">${usd(m.variableCost + m.fixedCost)}</div><span class="muted small">searches/email ${usd(m.variableCost)} · fixed ${usd(m.fixedCost)}</span></div>
+    <div class="tile"><span class="lbl">Net (confirmed)</span><div class="big ${m.netConfirmed < 0 ? 'neg' : 'good'}">${usd(m.netConfirmed)}</div><span class="muted small">if pending clears ${usd(m.netIfPendingClears)}</span></div>
+    <div class="tile"><span class="lbl">Clicks out</span><div class="big">${t.clicks.toLocaleString()}</div><span class="muted small">${t.visitors.toLocaleString()} visitors · ${t.bookings} bookings</span></div>
+    <div class="tile"><span class="lbl">Earned vs cost per click</span><div class="big">${usd(m.epc)}</div><span class="muted small">cost ${usd(m.costPerClick)} per click</span></div>
+  </div>
+  <section class="card"><h3>Worth chasing</h3>${d.flags.length ? d.flags.map((f) => `<div class="flag"><b class="${esc(f.level)}">${esc(f.level === 'money' ? 'missed money' : f.level)}</b><span>${esc(f.text)}</span></div>`).join('') : '<p class="muted">Nothing flagged.</p>'}
+    <p class="small"><a href="${q('dispute')}">Download dispute file</a> · <a href="${q('clicks')}">All clicks (CSV)</a> · <a href="${q('conversions')}">Commission ledger (CSV)</a></p></section>
+  <section class="card"><h3>By partner</h3><div class="scroll"><table class="tbl"><thead><tr><th>Partner</th><th class="num">Clicks</th><th class="num">Tagged</th><th class="num">Bookings</th><th class="num">Conv.</th><th class="num">Sales</th><th class="num">Earned</th><th class="num">Per click</th><th class="num">Rate</th><th></th></tr></thead><tbody>
+    ${d.partners.map((p) => `<tr><td>${esc(p.name)}</td><td class="num">${p.clicks}</td><td class="num">${p.clicks ? Math.round(p.tracked / p.clicks * 100) + '%' : '—'}</td><td class="num">${p.bookings}</td><td class="num">${pct(p.clicks ? p.convRate : null)}</td><td class="num">${usd(p.sales)}</td><td class="num">${usd(p.earned)}</td><td class="num">${usd(p.epc)}</td><td class="num">${pct(p.effRate)}</td><td><a class="small" href="${q('clicks', '&partner=' + encodeURIComponent(p.partner))}">clicks</a></td></tr>`).join('') || '<tr><td colspan="10" class="muted">No clicks yet.</td></tr>'}
+  </tbody></table></div></section>
+  <div class="two">
+    <section class="card"><h3>Where people click</h3><table class="tbl"><tbody>${d.placements.map((p) => `<tr><td>${esc(p.placement)}</td><td class="num">${p.clicks}</td></tr>`).join('') || '<tr><td class="muted">No clicks yet.</td></tr>'}</tbody></table></section>
+    <section class="card"><h3>Usage</h3><table class="tbl"><tbody>
+      <tr><td>Live price checks</td><td class="num">${(d.usage.live_checks || 0).toLocaleString()}</td><td class="num">${usd((d.usage.live_checks || 0) * m.perLookup)}</td></tr>
+      <tr><td>Emails sent</td><td class="num">${(d.usage.emails || 0).toLocaleString()}</td><td class="num">${usd((d.usage.emails || 0) * m.perEmail)}</td></tr>
+      <tr><td>Bookings travelers reported</td><td class="num">${t.reported}</td><td></td></tr></tbody></table>
+      <p class="muted small">Unit costs: $${m.perLookup.toFixed(3)} per check, ${usd(m.perEmail)} per email (set COST_PER_LOOKUP / COST_PER_EMAIL).</p></section>
+  </div>
+  <div class="two">
+    <section class="card"><h3>Import a commission report</h3><p class="muted small">Export transactions as CSV from Awin, CJ, Impact, Travelpayouts, Booking.com or any partner, then paste or choose the file. Re-importing updates statuses.</p>
+      <form id="imp"><label>Network<input name="network" placeholder="awin, cj, impact, booking…" required></label>
+      <label>CSV file<input type="file" name="file" accept=".csv,text/csv"></label><textarea name="csv" placeholder="…or paste the CSV here, with the header row"></textarea>
+      <button class="primary">Import</button> <span id="imp-msg" class="small muted"></span></form></section>
+    <section class="card"><h3>Fixed monthly costs</h3><form id="cost" class="costf"><label>Month<input name="month" type="month" required></label><label>Item<input name="item" placeholder="SerpApi plan, domain…" required></label><label>Amount $<input name="amount" type="number" step="0.01" required></label><button>Add</button></form>
+      <table class="tbl"><tbody>${d.fixed.map((c) => `<tr><td>${esc(c.month)}</td><td>${esc(c.item)}</td><td class="num">${usd(c.amount)}</td><td><button class="ghost small" data-del="${esc(c.id)}">Remove</button></td></tr>`).join('') || '<tr><td class="muted">None in this range.</td></tr>'}</tbody></table></section>
+  </div>`;
+  $('#rng').onsubmit = (e) => { e.preventDefault(); const f = new FormData(e.target); range = {from: f.get('from'), to: f.get('to')}; load(); };
+  $('#imp').onsubmit = async (e) => {
+    e.preventDefault(); const f = new FormData(e.target), msg = $('#imp-msg');
+    const file = f.get('file'); const csv = file && file.size ? await file.text() : f.get('csv');
+    msg.textContent = 'Importing…';
+    try { const r = await json('/api/admin/import', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({network: f.get('network'), csv})});
+      msg.textContent = `Imported ${r.imported} (${r.matched} matched to clicks, ${r.unmatched} unmatched${r.skipped ? ', ' + r.skipped + ' skipped' : ''}).`; setTimeout(load, 1500); }
+    catch (err) { msg.textContent = err.message; }
+  };
+  $('#cost').onsubmit = async (e) => { e.preventDefault(); const f = Object.fromEntries(new FormData(e.target));
+    try { await json('/api/admin/costs', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(f)}); load(); } catch (err) { e.target.append(Object.assign(document.createElement('span'), {className: 'small muted', textContent: ' ' + err.message})); } };
+  document.querySelectorAll('[data-del]').forEach((b) => b.onclick = async () => { await json('/api/admin/costs?id=' + encodeURIComponent(b.dataset.del), {method: 'DELETE'}); load(); });
+}
+load();
+</script>
+</body>
+</html>

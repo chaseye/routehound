@@ -13,3 +13,5 @@ jobs:
           node-version: 22
       - run: node --check public/assets/app.js
       - run: node test/engine.test.mjs
+      - run: node test/ledger.test.mjs
+      - run: for f in lib/*.js functions/*.js functions/api/*.js functions/api/*/*.js; do node --check "$f"; done

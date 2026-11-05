@@ -3,7 +3,7 @@
  * GET    /api/trips?history=ID   — price history for one trip
  * POST   /api/trips {name, trip, targetPrice}
  * DELETE /api/trips?id=ID */
-import {db, currentUser, jsonRes, sameOrigin, newId, allow} from '../../lib/server.js';
+import {db, currentUser, jsonRes, sameOrigin, newId, allow, addUsage} from '../../lib/server.js';
 import {priceTrip} from '../../lib/track.js';
 
 async function auth(request, env) {
@@ -47,6 +47,7 @@ export async function onRequestPost({request, env}) {
   await DB.prepare('INSERT INTO trips (id, user_id, name, trip_json, target_price, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(id, user.id, name, JSON.stringify(trip), target, now).run();
   // First price right away so the list isn't empty.
   try {
+    await addUsage(DB, 'live_checks', 1);
     const p = await priceTrip(env, trip);
     if (p) {
       await DB.batch([

@@ -45,6 +45,7 @@ async function detectBackend() {
     const r = await fetch('/api/status', {headers: {Accept: 'application/json'}});
     backend = r.ok && (r.headers.get('content-type') || '').includes('json') ? await r.json() : false;
   } catch (e) { backend = false; }
+  window.RH_BACKEND = !!backend;
   return backend;
 }
 const regionOf = (q) => ({from: q.long ? 'a' : 'x', to: q.long ? 'b' : 'x'});
@@ -123,6 +124,7 @@ async function search() {
   out.scrollIntoView({behavior: 'smooth', block: 'start'});
   if (backend === null) await detectBackend();
 
+  window.RH_CTX = {s: Math.random().toString(36).slice(2, 10), r: [legs[0].from, ...legs.map((l) => l.to)].join('-'), c: legs[0].cabin || ''};
   const r1 = E.planSearches(trip, place);
   let total = r1.length, done = 0;
   const tick = () => { done++; bar.firstChild.style.width = `${Math.round(done / total * 100)}%`; msg.textContent = `Checked ${done} of ${total} price searches…`; };
@@ -163,14 +165,14 @@ function renderResults() {
 
   // Smart picks
   out.append(el('div', {class: 'section-h'}, el('div', {}, el('h2', {text: 'Smart picks'}), el('p', {class: 'muted', text: trip.includeStays === false ? 'Totals per person for flights and rides only. Each pick says what it changes from your plan.' : 'Whole-trip totals per person: flights, trains and stays. Each pick says what it changes from your plan.'}))));
-  const grid = el('div', {class: 'picks'});
+  const grid = el('div', {class: 'picks', 'data-pl': 'pick'});
   const heroId = [...rec.picks].filter((p) => p.id !== 'baseline' && !p.overBudget).sort((a, b) => a.total - b.total)[0]?.id || rec.picks[0]?.id;
   rec.picks.forEach((p) => grid.append(pickCard(p, rec, heroId)));
   out.append(grid);
 
   // Strategies
   if (rec.strategies.length) {
-    const t = el('table', {class: 'tbl'}, el('thead', {}, el('tr', {}, ['Strategy', 'Seat class', 'Trip total with stays', 'vs separate tickets', ''].map((h) => el('th', {text: h})))));
+    const t = el('table', {class: 'tbl', 'data-pl': 'strategy'}, el('thead', {}, el('tr', {}, ['Strategy', 'Seat class', 'Trip total with stays', 'vs separate tickets', ''].map((h) => el('th', {text: h})))));
     const tb = el('tbody');
     rec.strategies.forEach((s) => tb.append(el('tr', {},
       el('td', {text: s.name}), el('td', {text: CABINS[s.cabin]}), el('td', {class: 'num', text: usd(s.total)}),
@@ -226,7 +228,7 @@ function pickCard(p, rec, heroId) {
 }
 
 function legCard(l, i, rec, res) {
-  const card = el('section', {class: 'card'});
+  const card = el('section', {class: 'card', 'data-pl': 'leg'});
   card.append(el('header', {class: 'card-h'}, el('h3', {}, el('span', {class: 'code', text: `${l.from} → ${l.to}`}), ' ', el('span', {class: 'muted', text: `${place(l.from).city} to ${place(l.to).city}`})),
     el('span', {class: 'pill', text: `${nice(l.date)} · ${CABINS[l.cabin]}`})));
   // Date strip
@@ -274,7 +276,7 @@ function legCard(l, i, rec, res) {
 
 function stayCard(sp, i, res) {
   const s = sp.stop, hotels = res.hotels[i] || [];
-  const card = el('section', {class: 'card stay'});
+  const card = el('section', {class: 'card stay', 'data-pl': 'stay'});
   card.append(el('header', {class: 'card-h'}, el('h3', {text: `Stay in ${s.city}`}), el('span', {class: 'pill', text: `${nice(s.checkin)} – ${nice(s.checkout)} · ${s.nights} night${s.nights > 1 ? 's' : ''}`})));
   if (sp.overCap) card.append(el('p', {class: 'small warn', text: `Nothing available under ${usd(trip.nightly)} a night for these dates; showing the cheapest available.`}));
   if (!hotels.length) card.append(el('p', {class: 'muted', text: 'No availability returned for these dates. Try the sites below.'}));
@@ -308,9 +310,9 @@ function stayCard(sp, i, res) {
   card.append(list);
   const stop = {code: s.code, city: s.city, checkin: s.checkin, checkout: s.checkout, nights: s.nights, adults: trip.adults || 1, maxNight: trip.nightly || 0};
   const regional = RH.STAYS_REGIONAL[RH.REGION(s.country)] || [];
-  card.append(el('h4', {text: 'Search more sites'}), el('div', {class: 'chips'}, [...RH.STAYS, ...regional].map((x) => link(x.name, x.url(stop), 'chip small'))));
+  card.append(el('h4', {text: 'Search more sites'}), el('div', {class: 'chips', 'data-pl': 'stay-sites'}, [...RH.STAYS, ...regional].map((x) => link(x.name, x.url(stop), 'chip small'))));
   const q = encodeURIComponent(s.city);
-  card.append(el('h4', {text: `Things to do and extras in ${s.city}`}), el('div', {class: 'chips extras'}, [
+  card.append(el('h4', {text: `Things to do and extras in ${s.city}`}), el('div', {class: 'chips extras', 'data-pl': 'extras'}, [
     link('Tours on GetYourGuide', `https://www.getyourguide.com/s/?q=${q}`, 'chip small'),
     link('Tours on Viator', `https://www.viator.com/searchResults/all?text=${q}`, 'chip small'),
     link('Passes and tickets on Klook', `https://www.klook.com/search/result/?query=${q}`, 'chip small'),
@@ -406,7 +408,7 @@ async function renderAccount() {
   }
   const list = el('div', {class: 'trips'}, el('p', {class: 'muted', text: 'Loading your trips…'}));
   box.replaceChildren(
-    el('div', {class: 'acct-h'}, el('p', {}, flag === 'ok' ? el('strong', {text: 'Email verified. ', class: 'good'}) : null, 'Signed in as ', el('strong', {text: me.email})),
+    el('div', {class: 'acct-h'}, el('p', {}, flag === 'ok' ? el('strong', {text: 'Email verified. ', class: 'good'}) : null, 'Signed in as ', el('strong', {text: me.email}), me.admin ? el('span', {}, ' · ', el('a', {href: '/admin.html', text: 'Earnings & costs'})) : null),
       el('button', {type: 'button', class: 'ghost', text: 'Sign out', onclick: async () => { await api('/api/auth/logout', {method: 'POST'}).catch(() => {}); renderAccount(); }})),
     list);
   try {
@@ -477,7 +479,7 @@ async function renderExample() {
     el('div', {class: 'itin-end'}, el('span', {class: 'num', text: price ? usd(price) : '—'})));
   const useIt = el('button', {type: 'button', class: 'primary', text: 'Search this trip live', onclick: () => {
     trip.legs = deal.legs.map((l) => ({...l, cabin: deal.cabin})); save(); renderLegs(); search(); }});
-  out.replaceChildren(el('section', {class: 'example', 'aria-label': 'Example trip'},
+  out.replaceChildren(el('section', {class: 'example', 'data-pl': 'example', 'aria-label': 'Example trip'},
     el('span', {class: 'example-tag', text: 'Example'}),
     el('div', {class: 'example-body'},
       el('p', {class: 'lbl', text: `Today’s best find · checked ${when}`}),
