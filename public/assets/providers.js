@@ -224,13 +224,17 @@ export function json(data, status = 200, maxAge = 0) {
     'Cache-Control': maxAge ? `public, max-age=${maxAge}` : 'no-store', 'Access-Control-Allow-Origin': '*'}});
 }
 /* Cache successful JSON answers at Cloudflare's edge so repeated searches cost nothing. */
-export async function cached(request, ctx, ttl, make) {
+export async function cached(request, ctx, ttl, make, env = {}) {
   const cache = globalThis.caches?.default;
-  const key = new Request(new URL(request.url).toString(), {method: 'GET'});
+  // The cache key includes which sources are on, so adding a key never serves results saved before it.
+  const u = new URL(request.url);
+  u.searchParams.delete('t');
+  u.searchParams.set('_src', ['DUFFEL_TOKEN', 'SERPAPI_KEY', 'TRAVELPAYOUTS_TOKEN', 'LITEAPI_KEY'].map((k) => (env[k] ? 1 : 0)).join(''));
+  const key = new Request(u.toString(), {method: 'GET'});
   if (cache) { const hit = await cache.match(key); if (hit) return hit; }
   const data = await make();
-  const res = json(data, 200, ttl);
-  if (cache && !data.error) ctx.waitUntil(cache.put(key, res.clone()));
+  const res = json(data, 200, data.sample ? 0 : ttl);
+  if (cache && !data.error && !data.sample) ctx.waitUntil(cache.put(key, res.clone()));
   return res;
 }
 export const has = (env, k) => !!(env && env[k]);

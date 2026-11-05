@@ -27,7 +27,7 @@ const SAMPLE = {
     {from: 'CAN', to: 'HKG', date: '2027-01-18', cabin: 'economy'},
     {from: 'HKG', to: 'ORD', date: '2027-01-24', cabin: 'business'},
   ],
-  adults: 1, budget: 6500, nightly: 150, flex: 2, nearby: true, compareCabins: true, strategies: true,
+  adults: 1, budget: 6500, nightly: 150, flex: 2, nearby: true, compareCabins: true, strategies: true, includeStays: true,
 };
 const store = {
   get() { try { return JSON.parse(localStorage.getItem('rh-trip-v2') || 'null'); } catch (e) { return null; } },
@@ -88,7 +88,8 @@ function renderLegs() {
   });
 }
 function bindForm() {
-  const nums = ['adults', 'budget', 'nightly', 'flex'], checks = ['nearby', 'compareCabins', 'strategies'];
+  const nums = ['adults', 'budget', 'nightly', 'flex'], checks = ['nearby', 'compareCabins', 'strategies', 'includeStays'];
+  if (trip.includeStays === undefined) trip.includeStays = true;
   const fill = () => { nums.forEach((k) => { $('#' + k).value = trip[k]; }); checks.forEach((k) => { $('#' + k).checked = !!trip[k]; }); };
   fill();
   nums.forEach((k) => $('#' + k).addEventListener('input', (e) => { trip[k] = +e.target.value || 0; save(); }));
@@ -145,7 +146,7 @@ function renderResults() {
   if (res.errors.length) out.append(el('p', {class: 'small warn', text: `${res.errors.length} search${res.errors.length > 1 ? 'es' : ''} failed and were skipped.`}));
 
   // Smart picks
-  out.append(el('div', {class: 'section-h'}, el('div', {}, el('h2', {text: 'Smart picks'}), el('p', {class: 'muted', text: 'Whole-trip totals per person: flights, trains and stays. Each pick says what it changes from your plan.'}))));
+  out.append(el('div', {class: 'section-h'}, el('div', {}, el('h2', {text: 'Smart picks'}), el('p', {class: 'muted', text: trip.includeStays === false ? 'Totals per person for flights and rides only. Each pick says what it changes from your plan.' : 'Whole-trip totals per person: flights, trains and stays. Each pick says what it changes from your plan.'}))));
   const grid = el('div', {class: 'picks'});
   rec.picks.forEach((p) => grid.append(pickCard(p, rec)));
   out.append(grid);

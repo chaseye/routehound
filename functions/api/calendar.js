@@ -15,5 +15,5 @@ export async function onRequestGet(context) {
     }
     try { return {query: q, days: await tpCalendar(env, q), sample: false}; }
     catch (e) { return {query: q, days: [], error: String(e.message || e), sample: false}; }
-  });
+  }, env);
 }

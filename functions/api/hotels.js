@@ -34,5 +34,5 @@ export async function onRequestGet(context) {
     const list = [...byName.values()].sort((a, b) => q.sort === 'rating' ? (b.rating || 0) - (a.rating || 0) : a.pricePerNight - b.pricePerNight).slice(0, 30);
     return {query: q, hotels: list, sources: [...new Set(hotels.map((h) => h.provider))], errors, sample: false, checkedAt: new Date().toISOString(),
       error: !list.length && errors.length ? errors.join('; ') : undefined};
-  });
+  }, env);
 }

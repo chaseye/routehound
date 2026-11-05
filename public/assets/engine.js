@@ -84,7 +84,7 @@
         jobs.push({type: 'flights', purpose: 'multicity', variant: v.variant, legIdx: v.ls.map((l) => legs.indexOf(l)), q: {multi: enc(v.ls), cabin: c, adults: trip.adults, long: 1}});
       }
     }
-    stopsOf(trip, place).forEach((s, i) => jobs.push({type: 'hotels', stop: i, q: {city: s.city, country: s.country, checkin: s.checkin, checkout: s.checkout, adults: trip.adults, max: trip.nightly || 0}}));
+    if (trip.includeStays !== false) stopsOf(trip, place).forEach((s, i) => jobs.push({type: 'hotels', stop: i, q: {city: s.city, country: s.country, checkin: s.checkin, checkout: s.checkout, adults: trip.adults, max: trip.nightly || 0}}));
     if (returnsHome(legs) && trip.strategies !== false) {
       const first = legs[0], last = legs[legs.length - 1];
       for (const hub of [...new Set([first.to, last.from])]) {

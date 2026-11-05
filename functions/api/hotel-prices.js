@@ -13,5 +13,5 @@ export async function onRequestGet(context) {
   return cached(request, context, 60 * 60 * 2, async () => {
     try { return {query: q, sites: await serpHotelPrices(env, q), sample: false, checkedAt: new Date().toISOString()}; }
     catch (e) { return {query: q, sites: [], error: String(e.message || e)}; }
-  });
+  }, env);
 }
