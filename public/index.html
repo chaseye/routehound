@@ -50,13 +50,18 @@
         <label class="field" for="nightly"><span class="lbl">Max per night for stays (USD)</span><input id="nightly" type="number" min="0" step="10"></label>
         <label class="field" for="flex"><span class="lbl">Flexible by (± days)</span><input id="flex" type="number" min="0" max="5"></label>
       </div>
-      <div class="checks">
+      <fieldset class="modes">
+        <legend class="lbl">Search depth</legend>
+        <label class="mode" for="mode-quick"><input type="radio" name="mode" id="mode-quick" value="quick"> <span><strong>Quick</strong> Your dates and seats, plus one-ticket and train options. Fast and light.</span></label>
+        <label class="mode" for="mode-deep"><input type="radio" name="mode" id="mode-deep" value="deep"> <span><strong>Deep</strong> Also nearby dates, nearby airports, every seat class and round-trip combos.</span></label>
+      </fieldset>
+      <div class="checks" id="deep-opts">
         <label class="toggle" for="compareCabins"><input id="compareCabins" type="checkbox"> Compare every seat class</label>
         <label class="toggle" for="nearby"><input id="nearby" type="checkbox"> Try nearby airports</label>
         <label class="toggle" for="strategies"><input id="strategies" type="checkbox"> Try round trip + cheap hop</label>
         <label class="toggle" for="includeStays"><input id="includeStays" type="checkbox"> Include hotels in totals</label>
       </div>
-      <div class="actions"><button type="submit" id="go" class="primary">Sniff out prices</button></div>
+      <div class="actions"><button type="submit" id="go" class="primary">Sniff out prices</button><span id="estimate" class="muted small"></span></div>
     </form>
 
     <div id="plan-out"></div>
@@ -116,6 +121,7 @@
 </footer>
 
 <script src="assets/data.js"></script>
+<script src="assets/affiliates.js"></script>
 <script src="assets/engine.js"></script>
 <script type="module" src="assets/app.js"></script>
 </body>

@@ -1,5 +1,6 @@
 /* GET /api/flights?from=ORD&to=ICN&date=2027-01-08&cabin=business[&ret=2027-01-24][&adults=1][&long=1]
  * Live offers from Duffel and Google Flights (SerpApi), merged and sorted by price. Sample data when no keys are set. */
+import {spendLookup} from '../../lib/server.js';
 import {duffelFlights, serpFlights, demoFlights, cached, json, has, okCode, okDate, bookLink, parseMulti, normEnv} from '../../public/assets/providers.js';
 
 export async function onRequestGet(context) {
@@ -24,6 +25,9 @@ export async function onRequestGet(context) {
       const offers = demoFlights(q, {from: long ? 'a' : 'x', to: long ? 'b' : 'x'}).map((o) => ({...o, bookUrl: bookLink(o)}));
       return {query: q, offers, insights: null, sources: ['Sample'], sample: true, checkedAt: new Date().toISOString()};
     }
+    const cost = (has(env, 'DUFFEL_TOKEN') ? 1 : 0) + (has(env, 'SERPAPI_KEY') ? 1 : 0);
+    const budget = await spendLookup(request, env, cost);
+    if (!budget.ok) return {query: q, offers: [], error: budget.message, limited: budget.why, signedIn: !!budget.signedIn};
     const jobs = [];
     if (has(env, 'DUFFEL_TOKEN')) jobs.push(duffelFlights(env, q).then((offers) => ({offers})));
     if (has(env, 'SERPAPI_KEY')) jobs.push(serpFlights(env, q));

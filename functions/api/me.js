@@ -5,5 +5,6 @@ export async function onRequestGet({request, env}) {
   const DB = await db(env);
   if (!DB || (!env.RESEND_API_KEY && env.DEV_EMAIL_LOG !== '1')) return jsonRes({available: false}, 200);
   const user = await currentUser(request, DB);
-  return user ? jsonRes({available: true, email: user.email}) : jsonRes({available: true, email: null}, 200);
+  const turnstileSiteKey = env.TURNSTILE_SITE_KEY || null;
+  return jsonRes({available: true, email: user ? user.email : null, turnstileSiteKey});
 }

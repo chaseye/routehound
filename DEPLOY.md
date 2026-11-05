@@ -61,3 +61,23 @@ Your site is at `https://routehound.pages.dev` (or the name Cloudflare assigns).
 
 Security built in: one-time sign-in links (15 min, single use, stored hashed), HttpOnly/Secure/SameSite cookies,
 same-origin checks on every change, rate limits on sign-in requests, a hidden bot trap field, and no account-existence leaks.
+
+## 8. Cost controls (all optional; sensible defaults are built in)
+
+Add these as Cloudflare **variables** to tune spending. Cached answers are always free and never counted.
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `DAILY_SEARCH_LIMIT` | 200 | Live price checks the whole site may use per day. Above it, results show booking links only. |
+| `ANON_DAILY_LOOKUPS` | 25 | Per visitor (by IP) per day — about 2–3 Quick searches. |
+| `USER_DAILY_LOOKUPS` | 120 | Per signed-in user per day. |
+
+Quick search (default) uses ~6–10 checks; Deep search up to ~45. Saved-trip tracking shares one check across everyone
+watching the same trip and checks trips more than 60 days away every 3 days instead of daily.
+
+**Bot protection on sign-in (free):** Cloudflare dashboard → Turnstile → Add widget for your site.
+Add the site key as variable `TURNSTILE_SITE_KEY` and the secret as Secret `TURNSTILE_SECRET`.
+
+## 9. Affiliate IDs
+Paste each partner ID into `public/assets/affiliates.js` once approved (or ask Claude to). Every outbound link to that
+partner is tagged automatically when clicked. Network links (CJ, Awin, Impact, Travelpayouts) go under `templates`.

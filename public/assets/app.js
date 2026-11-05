@@ -27,7 +27,7 @@ const SAMPLE = {
     {from: 'CAN', to: 'HKG', date: '2027-01-18', cabin: 'economy'},
     {from: 'HKG', to: 'ORD', date: '2027-01-24', cabin: 'business'},
   ],
-  adults: 1, budget: 6500, nightly: 150, flex: 2, nearby: true, compareCabins: true, strategies: true, includeStays: true,
+  adults: 1, budget: 6500, nightly: 150, flex: 2, nearby: true, compareCabins: true, strategies: true, includeStays: true, mode: 'quick',
 };
 const store = {
   get() { try { return JSON.parse(localStorage.getItem('rh-trip-v2') || 'null'); } catch (e) { return null; } },
@@ -39,6 +39,7 @@ const valid = (l) => /^[A-Z]{3}$/.test(l.from) && /^[A-Z]{3}$/.test(l.to) && /^\
 
 /* ---------- Data access: same-origin API, or sample prices in the browser when there is no backend ---------- */
 let backend = null; // null = unknown, false = no backend (sample mode), object = status
+let limitNote = null; // set when a daily live-search limit is reached
 async function detectBackend() {
   try {
     const r = await fetch('/api/status', {headers: {Accept: 'application/json'}});
@@ -58,7 +59,9 @@ async function call(job) {
   const p = new URLSearchParams(Object.entries(q).filter(([, v]) => v != null && v !== '').map(([k, v]) => [k, String(v)]));
   const r = await fetch(`/api/${path}?${p}`);
   if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || `HTTP ${r.status}`);
-  return r.json();
+  const d = await r.json();
+  if (d.limited) { limitNote = d.error; throw new Error(d.error); }
+  return d;
 }
 async function runAll(jobs, onDone) {
   const out = []; let i = 0;
@@ -87,6 +90,10 @@ function renderLegs() {
         onclick: () => { trip.legs.splice(i, 1); save(); renderLegs(); }}), hint));
   });
 }
+function estimate() {
+  const n = E.estimateLookups({...trip, legs: trip.legs.filter(valid)});
+  $('#estimate').textContent = n ? `Uses about ${n} live price check${n > 1 ? 's' : ''}${trip.mode === 'deep' ? ' (up to)' : ''}. Recent identical searches are free.` : '';
+}
 function bindForm() {
   const nums = ['adults', 'budget', 'nightly', 'flex'], checks = ['nearby', 'compareCabins', 'strategies', 'includeStays'];
   if (trip.includeStays === undefined) trip.includeStays = true;
@@ -96,6 +103,11 @@ function bindForm() {
   checks.forEach((k) => $('#' + k).addEventListener('change', (e) => { trip[k] = e.target.checked; save(); }));
   $('#add').addEventListener('click', () => { const last = trip.legs.at(-1) || {}; trip.legs.push({from: last.to || '', to: '', date: last.date ? addDays(last.date, 3) : '', cabin: 'economy'}); save(); renderLegs(); });
   $('#reset').addEventListener('click', () => { trip = structuredClone(SAMPLE); save(); fill(); renderLegs(); });
+  if (!trip.mode) trip.mode = 'quick';
+  const setMode = () => { $('#mode-' + trip.mode).checked = true; $('#deep-opts').hidden = trip.mode !== 'deep'; estimate(); };
+  document.querySelectorAll('input[name=mode]').forEach((r) => r.addEventListener('change', (e) => { trip.mode = e.target.value; save(); setMode(); }));
+  setMode();
+  $('#trip').addEventListener('input', () => setTimeout(estimate, 0));
   $('#trip').addEventListener('submit', (e) => { e.preventDefault(); search(); });
 }
 
@@ -105,7 +117,7 @@ async function search() {
   const legs = trip.legs.filter(valid);
   const out = $('#plan-out');
   if (!legs.length) { out.replaceChildren(el('p', {class: 'muted', text: 'Add at least one leg with airport codes and a date.'})); return; }
-  const btn = $('#go'); btn.disabled = true;
+  const btn = $('#go'); btn.disabled = true; limitNote = null;
   const bar = el('div', {class: 'progress'}, el('div', {class: 'progress-fill'})), msg = el('p', {class: 'muted small', text: 'Checking prices…'});
   out.replaceChildren(el('div', {class: 'card'}, el('h3', {text: 'Sniffing out prices'}), msg, bar));
   out.scrollIntoView({behavior: 'smooth', block: 'start'});
@@ -143,7 +155,9 @@ function renderResults() {
   out.append(el('div', {class: 'banner ' + (sample ? 'warn-b' : 'ok-b')},
     el('strong', {text: sample ? 'Sample prices' : 'Live prices'}),
     el('span', {text: sample ? ' — this copy isn’t connected to price sources yet, so numbers are realistic examples. Book links open real searches.' : ` from ${srcs.join(', ')}, checked ${at.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'})}. Fares change often; confirm on the booking site.`})));
-  if (res.errors.length) out.append(el('p', {class: 'small warn', text: `${res.errors.length} search${res.errors.length > 1 ? 'es' : ''} failed and were skipped.`}));
+  if (limitNote) out.append(el('div', {class: 'banner warn-b'}, el('strong', {text: 'Daily limit reached. '}), limitNote, ' ',
+    me?.available && !me.email ? el('a', {href: '#account', text: 'Sign in for more'}) : null, ' Every result still has booking links you can open.'));
+  else if (res.errors.length) out.append(el('p', {class: 'small warn', text: `${res.errors.length} search${res.errors.length > 1 ? 'es' : ''} failed and were skipped.`}));
 
   out.append(trackCard());
 
@@ -295,6 +309,15 @@ function stayCard(sp, i, res) {
   const stop = {code: s.code, city: s.city, checkin: s.checkin, checkout: s.checkout, nights: s.nights, adults: trip.adults || 1, maxNight: trip.nightly || 0};
   const regional = RH.STAYS_REGIONAL[RH.REGION(s.country)] || [];
   card.append(el('h4', {text: 'Search more sites'}), el('div', {class: 'chips'}, [...RH.STAYS, ...regional].map((x) => link(x.name, x.url(stop), 'chip small'))));
+  const q = encodeURIComponent(s.city);
+  card.append(el('h4', {text: `Things to do and extras in ${s.city}`}), el('div', {class: 'chips extras'}, [
+    link('Tours on GetYourGuide', `https://www.getyourguide.com/s/?q=${q}`, 'chip small'),
+    link('Tours on Viator', `https://www.viator.com/searchResults/all?text=${q}`, 'chip small'),
+    link('Passes and tickets on Klook', `https://www.klook.com/search/result/?query=${q}`, 'chip small'),
+    link('Car rental (Discover Cars)', 'https://www.discovercars.com/', 'chip small'),
+    link('eSIM data (Airalo)', 'https://www.airalo.com/', 'chip small'),
+    link('Travel insurance (SafetyWing)', 'https://safetywing.com/', 'chip small'),
+  ]));
   return card;
 }
 
@@ -353,13 +376,20 @@ function signInForm(note) {
   const email = el('input', {id: 'signin-email', type: 'email', required: '', autocomplete: 'email', placeholder: 'you@example.com'});
   const trap = el('input', {id: 'signin-website', name: 'website', tabindex: '-1', autocomplete: 'off', class: 'hp', 'aria-hidden': 'true'});
   const btn = el('button', {type: 'submit', class: 'primary', text: 'Email me a sign-in link'});
+  const human = el('div', {class: 'cf-turnstile-box'});
+  let humanToken = null;
+  if (me?.turnstileSiteKey) {
+    const draw = () => window.turnstile?.render(human, {sitekey: me.turnstileSiteKey, callback: (t) => { humanToken = t; }});
+    if (window.turnstile) setTimeout(draw, 0);
+    else { const sc = document.createElement('script'); sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'; sc.async = true; sc.onload = draw; document.head.append(sc); }
+  }
   const form = el('form', {class: 'signin', onsubmit: async (e) => {
     e.preventDefault(); btn.disabled = true; msg.className = 'small'; msg.textContent = 'Sending…';
     try {
-      await api('/api/auth/start', {method: 'POST', body: JSON.stringify({email: email.value, website: trap.value})});
+      await api('/api/auth/start', {method: 'POST', body: JSON.stringify({email: email.value, website: trap.value, turnstile: humanToken})});
       msg.textContent = `Check ${email.value} for a link from RouteHound. It works once and expires in 15 minutes.`;
     } catch (err) { msg.className = 'small warn'; msg.textContent = err.message; btn.disabled = false; }
-  }}, el('label', {class: 'field', for: 'signin-email'}, el('span', {class: 'lbl', text: 'Email'}), email), trap, btn);
+  }}, el('label', {class: 'field', for: 'signin-email'}, el('span', {class: 'lbl', text: 'Email'}), email), trap, human, btn);
   return el('div', {}, note ? el('p', {class: 'small', text: note}) : null,
     el('p', {class: 'muted', text: 'No password needed. We email you a one-time link to confirm the address is yours.'}), form, msg);
 }

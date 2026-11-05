@@ -59,7 +59,8 @@
   const groundFor = (from, to) => GROUND.filter((g) => (g.a.includes(from) && g.b.includes(to)) || (g.b.includes(from) && g.a.includes(to)));
 
   const legsOf = (trip) => trip.legs.filter((l) => /^[A-Z]{3}$/.test(l.from) && /^[A-Z]{3}$/.test(l.to) && /^\d{4}-\d{2}-\d{2}$/.test(l.date));
-  const cabinsFor = (trip, l) => trip.compareCabins ? [...new Set([l.cabin, 'business', 'premium', 'economy'])] : [l.cabin];
+  const quick = (trip) => trip.mode !== 'deep';
+  const cabinsFor = (trip, l) => !quick(trip) && trip.compareCabins ? [...new Set([l.cabin, 'business', 'premium', 'economy'])] : [l.cabin];
   const returnsHome = (legs) => legs.length >= 2 && legs[0].from === legs[legs.length - 1].to;
 
   /* ---------- Round 1 ---------- */
@@ -85,7 +86,7 @@
       }
     }
     if (trip.includeStays !== false) stopsOf(trip, place).forEach((s, i) => jobs.push({type: 'hotels', stop: i, q: {city: s.city, country: s.country, checkin: s.checkin, checkout: s.checkout, adults: trip.adults, max: trip.nightly || 0}}));
-    if (returnsHome(legs) && trip.strategies !== false) {
+    if (returnsHome(legs) && trip.strategies !== false && !quick(trip)) {
       const first = legs[0], last = legs[legs.length - 1];
       for (const hub of [...new Set([first.to, last.from])]) {
         for (const c of cabinsFor(trip, first)) jobs.push({type: 'flights', purpose: 'roundtrip', hub, q: {from: first.from, to: hub, date: first.date, ret: last.date, cabin: c, adults: trip.adults, long: 1}});
@@ -114,6 +115,7 @@
   /* ---------- Round 2: cheapest nearby dates + nearby airports ---------- */
   function followUpSearches(trip, res) {
     const legs = legsOf(trip), jobs = [];
+    if (quick(trip)) return jobs; // quick search: no second round
     legs.forEach((l, i) => {
       if (trip.flex > 0) {
         const cal = (res.calendar[i] || []).filter((d) => Math.abs(nights(l.date, d.date)) <= trip.flex && d.date !== l.date);
@@ -315,6 +317,13 @@
     return {picks, strategies, stays: stayPick, options: opts, dateInsights, legs, stops, baseline: picks[0] || null};
   }
 
-  const api = {planSearches, followUpSearches, recommend, stopsOf, groundFor, NEARBY, GROUND, addDays, nights, nice, dow, usd, GRADE};
+  // Paid lookups a search will use (calendar comes from free cached data); round two is an upper bound.
+  function estimateLookups(trip) {
+    const r1 = planSearches(trip).filter((j) => j.type !== 'calendar').length;
+    const legs = legsOf(trip).length;
+    const r2 = quick(trip) ? 0 : legs * ((trip.flex > 0 ? 2 : 0) + (trip.nearby ? 2 : 0));
+    return r1 + r2;
+  }
+  const api = {estimateLookups, planSearches, followUpSearches, recommend, stopsOf, groundFor, NEARBY, GROUND, addDays, nights, nice, dow, usd, GRADE};
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.RHEngine = api;
 })(typeof window !== 'undefined' ? window : globalThis);

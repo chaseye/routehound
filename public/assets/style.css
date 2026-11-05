@@ -189,3 +189,13 @@ details summary{cursor:pointer;font-weight:650;margin-top:6px;color:var(--teal)}
 .card.track p{margin:4px 0 0}
 .track-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
 input.narrow{width:9rem}
+
+.modes{border:0;padding:0;margin:16px 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,18rem),1fr));gap:10px}
+.modes legend{margin-bottom:6px}
+.mode{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;background:var(--bg)}
+.mode:has(input:checked){border-color:var(--accent);background:var(--panel)}
+.mode input{width:auto;margin-top:4px}
+.mode span{font-size:.9rem;color:var(--muted)}
+.mode strong{display:block;color:var(--ink)}
+.actions{align-items:center}
+.extras{margin-top:10px}

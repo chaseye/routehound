@@ -1,5 +1,6 @@
 /* GET /api/hotels?city=Seoul&country=KR&checkin=2027-01-09&checkout=2027-01-13&adults=1[&max=150][&sort=price|rating]
  * Available stays with prices for the dates: Google Hotels (prices across booking sites) and LiteAPI (live room rates). */
+import {spendLookup} from '../../lib/server.js';
 import {serpHotels, liteHotels, demoHotels, cached, json, has, okDate, normEnv} from '../../public/assets/providers.js';
 
 export async function onRequestGet(context) {
@@ -15,6 +16,8 @@ export async function onRequestGet(context) {
   return cached(request, context, 60 * 60 * 2, async () => {
     const live = has(env, 'SERPAPI_KEY') || has(env, 'LITEAPI_KEY');
     if (!live) return {query: q, hotels: demoHotels(q), sources: ['Sample'], sample: true, checkedAt: new Date().toISOString()};
+    const budget = await spendLookup(request, env, (has(env, 'SERPAPI_KEY') ? 1 : 0) + (has(env, 'LITEAPI_KEY') && q.country ? 1 : 0));
+    if (!budget.ok) return {query: q, hotels: [], error: budget.message, limited: budget.why, signedIn: !!budget.signedIn};
     const jobs = [];
     if (has(env, 'SERPAPI_KEY')) jobs.push(serpHotels(env, q));
     if (has(env, 'LITEAPI_KEY') && q.country) jobs.push(liteHotels(env, q));

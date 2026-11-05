@@ -1,6 +1,6 @@
 /* POST /api/auth/start {email} — emails a one-time sign-in link (valid 15 minutes).
  * Always answers the same way so nobody can probe which emails have accounts. */
-import {db, allow, sha256, randomToken, sendEmail, emailLayout, esc, jsonRes, sameOrigin, clientIp, validEmail} from '../../../lib/server.js';
+import {turnstileOk, db, allow, sha256, randomToken, sendEmail, emailLayout, esc, jsonRes, sameOrigin, clientIp, validEmail} from '../../../lib/server.js';
 
 export async function onRequestPost({request, env}) {
   if (!sameOrigin(request)) return jsonRes({error: 'Bad origin.'}, 403);
@@ -12,6 +12,7 @@ export async function onRequestPost({request, env}) {
   const email = String(body.email || '').trim().toLowerCase();
   if (!validEmail(email)) return jsonRes({error: 'Enter a valid email address.'}, 400);
   const ip = clientIp(request);
+  if (!(await turnstileOk(env, body.turnstile, ip))) return jsonRes({error: 'Please complete the “I’m human” check.'}, 400);
   if (!(await allow(DB, `ip:${ip}`, 10, 60 * 60 * 1000)) || !(await allow(DB, `em:${email}`, 3, 15 * 60 * 1000))) {
     return jsonRes({error: 'Too many requests. Try again in a few minutes.'}, 429);
   }
