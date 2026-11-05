@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>RouteHound</title>
+<meta name="description" content="RouteHound sniffs out the cheapest way to fly, ride, sail and stay: compare flights, trains, buses, ferries, hotels and deal programs in one place.">
+<meta name="theme-color" content="#13231e">
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#plan" aria-label="RouteHound home">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="var(--ink)"/><path d="M8 27c5 0 6-9 12-9s6 7 12 7" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 5"/><circle cx="32" cy="25" r="3.2" fill="var(--accent)"/><circle cx="8" cy="27" r="2.4" fill="var(--bg)"/></svg>
+      <b>RouteHound</b>
+    </a>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#plan">Plan a trip</a>
+      <a href="#deals">Deals &amp; memberships</a>
+      <a href="#explore">Explore</a>
+      <a href="#entry">Visas &amp; entry</a>
+      <a href="#partners">Partner with us</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- PLAN -->
+  <section id="plan">
+    <div class="hero">
+      <h1>Sniff out the <em>cheapest way</em> to fly, ride, sail and stay.</h1>
+      <p>Type your route once. RouteHound lines up every flight site, the trains, buses and ferries that might beat flying, and the stays in each stop, with your budget built in.</p>
+      <svg class="trail" viewBox="0 0 600 28" preserveAspectRatio="none" aria-hidden="true"><path d="M2 20 C120 2 180 26 300 14 S480 4 598 18" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-dasharray="2 9" stroke-linecap="round"/></svg>
+    </div>
+
+    <form id="trip" class="panel" autocomplete="off">
+      <span class="lbl">Your route (one row per flight or ride)</span>
+      <div id="legs" class="legs"></div>
+      <div class="actions"><button type="button" id="add">Add a leg</button><button type="button" id="reset" class="ghost">Load example trip</button></div>
+      <div class="opts">
+        <label class="field" for="adults"><span class="lbl">Travelers</span><input id="adults" type="number" min="1" max="9"></label>
+        <label class="field" for="budget"><span class="lbl">Trip budget per person (USD)</span><input id="budget" type="number" min="0" step="100"></label>
+        <label class="field" for="nightly"><span class="lbl">Max per night for stays (USD)</span><input id="nightly" type="number" min="0" step="10"></label>
+        <label class="field" for="flex"><span class="lbl">Nearby dates (± days)</span><input id="flex" type="number" min="0" max="5"></label>
+      </div>
+      <div class="actions"><button type="submit" class="primary">Sniff out prices</button></div>
+    </form>
+
+    <div id="plan-out"></div>
+  </section>
+
+  <!-- DEALS -->
+  <section id="deals" hidden>
+    <div class="section-h"><div><h2>Deals, memberships and cashback</h2><p class="muted">Stack these with the searches: alert clubs find the fare, loyalty programs knock off member prices, cashback portals pay you back. Promo links search each platform for the latest codes.</p></div></div>
+    <div id="deal-list" class="grid"></div>
+  </section>
+
+  <!-- EXPLORE -->
+  <section id="explore" hidden>
+    <div class="section-h">
+      <div><h2>Explore your stops</h2><p class="muted">Official tourism sites plus videos and posts from YouTube, TikTok, Instagram, Facebook, X and Pinterest for each place on your route.</p></div>
+      <label class="toggle" for="family"><input id="family" type="checkbox"> Family-friendly results</label>
+    </div>
+    <div id="explore-places" class="grid"></div>
+    <div class="section-h"><div><h2>Travel trends for 2027</h2><p class="muted">From Skyscanner, Expedia and Priceline’s published 2027 trend reports.</p></div></div>
+    <ul id="trend-list" class="trends"></ul>
+    <h4>Rising destinations</h4>
+    <div id="hotspots" class="chips"></div>
+  </section>
+
+  <!-- ENTRY -->
+  <section id="entry" hidden>
+    <div class="section-h">
+      <div><h2>Visas and entry requirements</h2><p class="muted">For every country on your route. Summaries are for US passports as of November 2026; always confirm on the official site before you book and again before you fly.</p></div>
+      <label class="field" for="passport" style="min-width:13rem"><span class="lbl">Passport</span><select id="passport"><option value="US">United States</option><option value="OTHER">Another country</option></select></label>
+    </div>
+    <div id="entry-list" class="grid"></div>
+  </section>
+
+  <!-- PARTNERS -->
+  <section id="partners" hidden>
+    <div class="section-h"><div><h2>Partner with RouteHound</h2><p class="muted">RouteHound sends travelers who are ready to book. We work with airlines, booking sites, rail and ferry operators, hotels and deal clubs through affiliate links and clearly labeled placements.</p></div></div>
+    <div class="partner-grid">
+      <article class="card"><h3>Affiliate partners</h3><p class="muted">Earn bookings from comparison links on every search. We use your affiliate or partner program’s tracking.</p></article>
+      <article class="card"><h3>Featured placements</h3><p class="muted">Sponsored spots on route, stay and deal pages, always labeled “Sponsored”, never mixed into price order.</p></article>
+      <article class="card"><h3>Destination campaigns</h3><p class="muted">Tourism boards and operators can feature routes, rail passes and seasonal offers on Explore pages.</p></article>
+      <article class="card"><h3>Get in touch</h3><p class="muted">Partnership inquiries: <span id="contact">partners@routehound.example</span></p></article>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>RouteHound compares by linking you to each site’s live search. Prices and availability are set by those sites. Some links may earn us a commission at no extra cost to you; it never changes which options we show.</p>
+    <p>© <span id="year"></span> RouteHound</p>
+  </div>
+</footer>
+
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
