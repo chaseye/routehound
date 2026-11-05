@@ -159,8 +159,10 @@
     // Nightly rate per stop: cheapest available within the cap (fallback: cheapest available).
     const stayPick = stops.map((s, i) => {
       const hs = (res.hotels[i] || []).filter((h) => h.available !== false);
-      const within = trip.nightly ? hs.filter((h) => h.pricePerNight <= trip.nightly) : hs;
-      const pool = within.length ? within : hs;
+      const decent = hs.filter((h) => !h.rating || h.rating >= (trip.minRating ?? 3.5));
+      const base = decent.length ? decent : hs;
+      const within = trip.nightly ? base.filter((h) => h.pricePerNight <= trip.nightly) : base;
+      const pool = within.length ? within : base;
       const cheapest = [...pool].sort((a, b) => a.pricePerNight - b.pricePerNight)[0] || null;
       const value = [...pool].filter((h) => h.rating).sort((a, b) => (b.rating / Math.sqrt(b.pricePerNight)) - (a.rating / Math.sqrt(a.pricePerNight)))[0] || cheapest;
       return {stop: s, cheapest, value, overCap: !within.length && hs.length > 0};
