@@ -56,7 +56,7 @@ Each source is optional; RouteHound uses whichever keys are present.
 
 ```sh
 cp .dev.vars.example .dev.vars   # add your keys
-npx wrangler pages dev public    # http://localhost:8788
+npm run dev                      # http://localhost:8788
 npm test                         # engine tests on sample prices
 ```
 
