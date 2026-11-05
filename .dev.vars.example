@@ -1,0 +1,6 @@
+# Copy to .dev.vars for local testing (never commit .dev.vars).
+# In production, add these in Cloudflare: Pages project > Settings > Variables and Secrets (type: Secret).
+DUFFEL_TOKEN=duffel_test_xxx
+SERPAPI_KEY=xxx
+TRAVELPAYOUTS_TOKEN=xxx
+LITEAPI_KEY=sand_xxx

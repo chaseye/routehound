@@ -34,7 +34,7 @@
   <section id="plan">
     <div class="hero">
       <h1>Sniff out the <em>cheapest way</em> to fly, ride, sail and stay.</h1>
-      <p>Type your route once. RouteHound lines up every flight site, the trains, buses and ferries that might beat flying, and the stays in each stop, with your budget built in.</p>
+      <p>Type your route once. RouteHound checks real fares and hotel availability across dates, nearby airports, seat classes, trains and ferries, then tells you the smartest way to do the whole trip within your budget.</p>
       <svg class="trail" viewBox="0 0 600 28" preserveAspectRatio="none" aria-hidden="true"><path d="M2 20 C120 2 180 26 300 14 S480 4 598 18" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-dasharray="2 9" stroke-linecap="round"/></svg>
     </div>
 
@@ -46,9 +46,14 @@
         <label class="field" for="adults"><span class="lbl">Travelers</span><input id="adults" type="number" min="1" max="9"></label>
         <label class="field" for="budget"><span class="lbl">Trip budget per person (USD)</span><input id="budget" type="number" min="0" step="100"></label>
         <label class="field" for="nightly"><span class="lbl">Max per night for stays (USD)</span><input id="nightly" type="number" min="0" step="10"></label>
-        <label class="field" for="flex"><span class="lbl">Nearby dates (± days)</span><input id="flex" type="number" min="0" max="5"></label>
+        <label class="field" for="flex"><span class="lbl">Flexible by (± days)</span><input id="flex" type="number" min="0" max="5"></label>
       </div>
-      <div class="actions"><button type="submit" class="primary">Sniff out prices</button></div>
+      <div class="checks">
+        <label class="toggle" for="compareCabins"><input id="compareCabins" type="checkbox"> Compare every seat class</label>
+        <label class="toggle" for="nearby"><input id="nearby" type="checkbox"> Try nearby airports</label>
+        <label class="toggle" for="strategies"><input id="strategies" type="checkbox"> Try round trip + cheap hop</label>
+      </div>
+      <div class="actions"><button type="submit" id="go" class="primary">Sniff out prices</button></div>
     </form>
 
     <div id="plan-out"></div>
@@ -96,12 +101,13 @@
 
 <footer>
   <div class="wrap">
-    <p>RouteHound compares by linking you to each site’s live search. Prices and availability are set by those sites. Some links may earn us a commission at no extra cost to you; it never changes which options we show.</p>
+    <p>Prices come from live airline and hotel data sources and can change at any time; the booking site’s price is final. Some links may earn us a commission at no extra cost to you; it never changes which options we show.</p>
     <p>© <span id="year"></span> RouteHound</p>
   </div>
 </footer>
 
 <script src="assets/data.js"></script>
-<script src="assets/app.js"></script>
+<script src="assets/engine.js"></script>
+<script type="module" src="assets/app.js"></script>
 </body>
 </html>

@@ -1,0 +1,9 @@
+{
+  "name": "routehound",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node test/engine.test.mjs",
+    "dev": "npx wrangler pages dev public"
+  }
+}
