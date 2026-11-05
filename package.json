@@ -5,5 +5,8 @@
   "scripts": {
     "test": "node test/engine.test.mjs",
     "dev": "npx wrangler pages dev public"
+  },
+  "devDependencies": {
+    "wrangler": "^4.158.0"
   }
 }

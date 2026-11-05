@@ -35,6 +35,7 @@ export async function onRequestGet(context) {
       if (!best.has(k) || best.get(k).price > o.price) best.set(k, o);
     }
     const list = [...best.values()].map((o) => ({...o, bookUrl: o.bookUrl || bookLink(o)})).sort((a, b) => a.price - b.price).slice(0, 25);
-    return {query: q, offers: list, insights, sources: [...new Set(list.map((o) => o.provider))], errors, sample: false, checkedAt: new Date().toISOString()};
+    return {query: q, offers: list, insights, sources: [...new Set(list.map((o) => o.provider))], errors, sample: false, checkedAt: new Date().toISOString(),
+      error: !list.length && errors.length ? errors.join('; ') : undefined};
   });
 }
