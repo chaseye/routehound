@@ -148,7 +148,8 @@ function renderResults() {
   // Smart picks
   out.append(el('div', {class: 'section-h'}, el('div', {}, el('h2', {text: 'Smart picks'}), el('p', {class: 'muted', text: trip.includeStays === false ? 'Totals per person for flights and rides only. Each pick says what it changes from your plan.' : 'Whole-trip totals per person: flights, trains and stays. Each pick says what it changes from your plan.'}))));
   const grid = el('div', {class: 'picks'});
-  rec.picks.forEach((p) => grid.append(pickCard(p, rec)));
+  const heroId = [...rec.picks].filter((p) => p.id !== 'baseline' && !p.overBudget).sort((a, b) => a.total - b.total)[0]?.id || rec.picks[0]?.id;
+  rec.picks.forEach((p) => grid.append(pickCard(p, rec, heroId)));
   out.append(grid);
 
   // Strategies
@@ -175,20 +176,30 @@ function renderResults() {
   }
 }
 
-function pickCard(p, rec) {
+function pickCard(p, rec, heroId) {
   const itin = el('ol', {class: 'itin'});
-  p.picks.forEach((o) => itin.append(el('li', {},
-    el('span', {class: 'itin-d', text: nice(o.date)}),
-    el('span', {class: 'code', text: o.multi ? o.multi.map((m) => `${m.from}→${m.to}`).join(' · ') : o.ret ? `${o.from} ⇄ ${o.to}` : `${o.from} → ${o.to}`}),
-    el('span', {class: 'muted', text: o.multi ? ` one ticket · ${o.airline || ''} · ${CABINS[o.cabin]}` : o.kind === 'ground' ? ` ${o.mode} · ${hrs(o.durationMin)} · typical fare` : ` ${o.airline || ''} · ${CABINS[o.cabin]} · ${o.stops === 0 ? 'nonstop' : o.stops + ' stop' + (o.stops > 1 ? 's' : '')} · ${hrs(o.durationMin)}`}),
-    el('span', {class: 'num', text: usd(o.price)}),
-    link(o.kind === 'ground' ? 'Book' : 'Book', o.bookUrl || bookLink(o), 'chip small'))));
+  const stopsTxt = (o) => o.stops === 0 ? 'nonstop' : `${o.stops} stop${o.stops > 1 ? 's' : ''}`;
+  p.picks.forEach((o) => {
+    const route = o.multi
+      ? o.multi.map((m) => el('span', {class: 'itin-seg'}, el('span', {class: 'code', text: `${m.from} → ${m.to}`}), el('span', {class: 'muted', text: ` ${nice(m.date)}`})))
+      : [el('span', {class: 'itin-seg'}, el('span', {class: 'code', text: o.ret ? `${o.from} ⇄ ${o.to}` : `${o.from} → ${o.to}`}), o.ret ? el('span', {class: 'muted', text: ` back ${nice(o.ret)}`}) : null)];
+    const detail = o.kind === 'ground' ? `${o.mode} · ${o.op} · about ${hrs(o.durationMin)} · typical fare`
+      : [o.multi ? 'One ticket' : null, o.airline, CABINS[o.cabin], o.multi ? null : stopsTxt(o), o.durationMin ? hrs(o.durationMin) : null].filter(Boolean).join(' · ');
+    itin.append(el('li', {},
+      el('span', {class: 'itin-d', text: nice(o.date)}),
+      el('div', {class: 'itin-main'}, ...route, el('span', {class: 'muted small', text: detail})),
+      el('div', {class: 'itin-end'}, el('span', {class: 'num strong', text: usd(o.price)}), link('Book', o.bookUrl || bookLink(o), 'chip small'))));
+  });
   rec.stays.forEach((sp) => {
     const h = p.id === 'value' ? sp.value : sp.cheapest;
-    if (h) itin.append(el('li', {class: 'itin-stay'}, el('span', {class: 'itin-d', text: `${sp.stop.nights} nights`}), el('span', {text: `Stay in ${sp.stop.city}`}), el('span', {class: 'muted', text: ` ${h.name}${h.rating ? ` · ${h.rating}★ rating` : ''}`}), el('span', {class: 'num', text: `${usd(h.pricePerNight)}/night`}), el('span')));
+    if (!h) return;
+    itin.append(el('li', {class: 'itin-stay'},
+      el('span', {class: 'itin-d', text: `${sp.stop.nights} night${sp.stop.nights > 1 ? 's' : ''}`}),
+      el('div', {class: 'itin-main'}, el('span', {class: 'strong', text: `Stay in ${sp.stop.city}`}), el('span', {class: 'muted small', text: [h.name, h.rating ? `${h.rating}★` : null].filter(Boolean).join(' · ')})),
+      el('div', {class: 'itin-end'}, el('span', {class: 'num strong', text: `${usd(h.pricePerNight)}/night`}), link('Book', h.link || h.sources?.[0]?.link || `https://www.google.com/travel/search?q=${encodeURIComponent(`${h.name} ${sp.stop.city}`)}`, 'chip small'))));
   });
   const badge = p.id === 'baseline' ? null : p.saves > 0 ? el('span', {class: 'pill ok', text: `Saves ${usd(p.saves)}`}) : p.saves < 0 ? el('span', {class: 'pill', text: `${usd(-p.saves)} more`}) : null;
-  return el('article', {class: 'card pick' + (p.id === 'cheapest' ? ' hero-pick' : '')},
+  return el('article', {class: 'card pick' + (p.id === heroId ? ' hero-pick' : '')},
     el('header', {class: 'card-h'}, el('h3', {text: p.title}), badge),
     el('div', {class: 'big'}, usd(p.total)),
     el('p', {class: 'muted small', text: `Flights & rides ${usd(p.flights)} · Stays ${usd(p.stay)} · about ${p.hours} h in transit`}),
@@ -334,10 +345,37 @@ bindForm(); renderLegs(); renderDeals(); renderTrends(); renderExplore(); render
 $('#family').addEventListener('change', renderExplore);
 $('#passport').addEventListener('change', renderEntry);
 $('#year').textContent = new Date().getFullYear();
+/* Home page example: today's best find, dimmed so it never reads as the visitor's own results.
+   A live search only runs when the visitor asks for one (protects the API quota). */
+async function renderExample() {
+  const out = $('#plan-out');
+  let deal = null;
+  try { deal = await fetch('/deal.json', {cache: 'no-cache'}).then((r) => r.ok ? r.json() : null); } catch (e) { deal = null; }
+  if (!deal || lastRun) return;
+  const when = new Date(deal.checkedAt).toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
+  const row = (l, price, airline) => el('li', {}, el('span', {class: 'itin-d', text: nice(l.date)}),
+    el('div', {class: 'itin-main'}, el('span', {class: 'code', text: `${l.from} → ${l.to}`}), el('span', {class: 'muted small', text: `${place(l.from).city} to ${place(l.to).city}${airline ? ' · ' + airline : ''}`})),
+    el('div', {class: 'itin-end'}, el('span', {class: 'num', text: price ? usd(price) : '—'})));
+  const useIt = el('button', {type: 'button', class: 'primary', text: 'Search this trip live', onclick: () => {
+    trip.legs = deal.legs.map((l) => ({...l, cabin: deal.cabin})); save(); renderLegs(); search(); }});
+  out.replaceChildren(el('section', {class: 'example', 'aria-label': 'Example trip'},
+    el('span', {class: 'example-tag', text: 'Example'}),
+    el('div', {class: 'example-body'},
+      el('p', {class: 'lbl', text: `Today’s best find · checked ${when}`}),
+      el('h2', {text: deal.title}),
+      el('p', {class: 'muted', text: `${deal.cabin[0].toUpperCase() + deal.cabin.slice(1)}, ${deal.legs.length} flights. Booked as one multi-city ticket instead of separate flights.`}),
+      el('div', {class: 'ex-compare'},
+        el('div', {}, el('span', {class: 'lbl', text: 'One ticket'}), el('div', {class: 'big', text: usd(deal.oneTicket.price)}), el('span', {class: 'muted small', text: deal.oneTicket.airline || ''})),
+        el('div', {}, el('span', {class: 'lbl', text: 'Separate tickets'}), el('div', {class: 'big muted-num', text: usd(deal.separate.total)})),
+        el('div', {}, el('span', {class: 'lbl', text: 'You save'}), el('div', {class: 'big good', text: usd(deal.savings)}))),
+      el('ol', {class: 'itin'}, deal.separate.parts.map((p) => row(p, p.price, p.airline)))),
+    el('div', {class: 'example-cta'}, el('p', {class: 'small', text: 'This is an example, not your trip. Enter your own route above, or try this one with today’s prices.'}), useIt)));
+}
+
 detectBackend().then((b) => {
   const live = b && [b.flights?.duffel, b.flights?.googleFlights, b.hotels?.googleHotels, b.hotels?.liteapi].some(Boolean);
   const badge = $('#live-badge');
   badge.textContent = live ? 'Live prices' : 'Sample prices';
   badge.className = 'pill ' + (live ? 'ok' : 'act');
-  search();
 });
+renderExample();

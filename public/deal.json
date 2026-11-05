@@ -1,0 +1,21 @@
+{
+  "title": "Seoul + Hong Kong from Chicago",
+  "checkedAt": "2026-11-05T22:30:00Z",
+  "cabin": "economy",
+  "adults": 1,
+  "legs": [
+    {"from": "ORD", "to": "ICN", "date": "2027-01-08"},
+    {"from": "ICN", "to": "HKG", "date": "2027-01-13"},
+    {"from": "HKG", "to": "ORD", "date": "2027-01-24"}
+  ],
+  "oneTicket": {"price": 1182, "airline": "Air Canada", "stops": 1, "bookUrl": "https://www.kayak.com/flights/ORD-ICN/2027-01-08/ICN-HKG/2027-01-13/HKG-ORD/2027-01-24?sort=price_a"},
+  "separate": {
+    "total": 1430,
+    "parts": [
+      {"from": "ORD", "to": "ICN", "date": "2027-01-08", "price": 714, "airline": "Turkish Airlines"},
+      {"from": "ICN", "to": "HKG", "date": "2027-01-13", "price": 98, "airline": null},
+      {"from": "HKG", "to": "ORD", "date": "2027-01-24", "price": 618, "airline": null}
+    ]
+  },
+  "savings": 248
+}

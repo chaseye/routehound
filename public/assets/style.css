@@ -125,7 +125,10 @@ footer p{max-width:70ch}
 .reasons{margin:4px 0 0;padding-left:1.1rem;font-size:.9rem;display:grid;gap:3px}
 details summary{cursor:pointer;font-weight:650;margin-top:6px;color:var(--teal)}
 .itin{list-style:none;padding:0;margin:10px 0 0;display:grid;gap:6px}
-.itin li{display:grid;grid-template-columns:5.5rem minmax(0,auto) 1fr auto auto;gap:8px;align-items:center;font-size:.86rem;border-top:1px dashed var(--line);padding-top:6px}
+.itin li{display:grid;grid-template-columns:4.8rem minmax(0,1fr) auto;gap:6px 12px;align-items:start;font-size:.88rem;border-top:1px dashed var(--line);padding-top:8px}
+.itin-main{display:flex;flex-direction:column;gap:2px;min-width:0;overflow-wrap:anywhere}
+.itin-seg{white-space:nowrap}
+.itin-end{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
 .itin .itin-d{color:var(--muted);font-variant-numeric:tabular-nums}
 .itin-stay{color:var(--teal)}
 .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -155,6 +158,17 @@ details summary{cursor:pointer;font-weight:650;margin-top:6px;color:var(--teal)}
 @media (max-width:640px){
   .hotel{grid-template-columns:1fr}
   .hotel img,.img-ph{width:100%;height:9rem}
-  .itin li{grid-template-columns:1fr auto;}
-  .itin li > :nth-child(3){grid-column:1/-1}
+  .itin li{grid-template-columns:minmax(0,1fr) auto}
+  .itin .itin-d{grid-column:1/-1}
 }
+
+/* Home page example (dimmed so it is never mistaken for real results) */
+.example{position:relative;border:1px dashed var(--line);border-radius:var(--r);background:var(--panel);overflow:hidden}
+.example-body{padding:22px;opacity:.55;filter:saturate(.6);pointer-events:none;user-select:none}
+.example-body h2{margin:4px 0}
+.example-tag{position:absolute;top:14px;right:-38px;transform:rotate(35deg);background:var(--ink);color:var(--bg);font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:.72rem;padding:5px 46px;z-index:1}
+.ex-compare{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,9rem),1fr));gap:12px;margin:12px 0}
+.ex-compare .big{font-family:var(--f-display);font-size:1.9rem;font-weight:800}
+.muted-num{color:var(--muted);text-decoration:line-through;text-decoration-thickness:2px}
+.example-cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:14px 22px;border-top:1px dashed var(--line);background:var(--bg)}
+.example-cta p{margin:0;max-width:52ch}
