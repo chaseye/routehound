@@ -1,6 +1,6 @@
 // Run: node test/engine.test.mjs   (uses sample prices, no network)
 import assert from 'node:assert/strict';
-import {demoFlights, demoCalendar, demoHotels} from '../public/assets/providers.js';
+import {demoFlights, demoCalendar, demoHotels, parseMulti} from '../public/assets/providers.js';
 await import('../public/assets/engine.js');
 const E = globalThis.RHEngine;
 
@@ -16,7 +16,7 @@ const trip = {legs: [
   adults: 1, budget: 6500, nightly: 150, flex: 2, nearby: true, compareCabins: true};
 
 const region = (q) => ({from: place(q.from).region, to: place(q.to).region});
-const run = (job) => job.type === 'flights' ? {offers: demoFlights(job.q, region(job.q)), sample: true}
+const run = (job) => job.type === 'flights' ? {offers: demoFlights(job.q.multi ? {...job.q, multi: parseMulti(job.q.multi)} : job.q, region(job.q)), sample: true}
   : job.type === 'calendar' ? {days: demoCalendar(job.q, region(job.q))} : {hotels: demoHotels({...job.q, nights: E.nights(job.q.checkin, job.q.checkout), maxNight: job.q.max})};
 
 const res = {flights: [], calendar: {}, hotels: {}};
@@ -41,6 +41,8 @@ for (const p of out.picks) {
 assert.ok(out.picks.find((p) => p.id === 'comfort').total <= trip.budget, 'comfort pick fits the budget');
 assert.ok(out.options[2].some((o) => o.kind === 'ground'), 'Guangzhou to Hong Kong offers the train');
 assert.equal(out.stops.length, 3, 'three stays');
+assert.ok(out.strategies.some((s) => s.multicity), 'prices the trip as one multi-city ticket');
+assert.ok(out.strategies.some((s) => s.multicity && /train/i.test(s.name)), 'multi-city variant that takes the train for Guangzhou to Hong Kong');
 for (const p of out.picks) console.log(`${p.title}: ${E.usd(p.total)} (flights ${E.usd(p.flights)} + stays ${E.usd(p.stay)}), saves ${E.usd(p.saves)}\n   ${p.reasons.join('\n   ') || '(no changes)'}`);
 for (const s of out.strategies) console.log(`Strategy ${s.name} [${s.cabin}]: ${E.usd(s.total)} vs separate one-ways ${E.usd(s.separate)} (${s.vsSeparate >= 0 ? 'saves ' + E.usd(s.vsSeparate) : E.usd(-s.vsSeparate) + ' more'})`);
 console.log('all engine checks passed');

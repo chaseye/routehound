@@ -73,6 +73,17 @@
         months.forEach((m) => jobs.push({type: 'calendar', leg: i, q: {from: l.from, to: l.to, month: m, long: long(l)}}));
       }
     });
+    // The whole trip as ONE multi-city ticket (often far cheaper than separate tickets),
+    // and a version that leaves out legs you could do by train, bus or ferry.
+    if (legs.length >= 2 && trip.strategies !== false) {
+      const enc = (ls) => ls.map((l) => `${l.from}-${l.to}-${l.date}`).join(',');
+      const airLegs = legs.filter((l) => !groundFor(l.from, l.to).length);
+      const variants = [{variant: 'all', ls: legs}];
+      if (airLegs.length >= 2 && airLegs.length < legs.length) variants.push({variant: 'air', ls: airLegs});
+      for (const v of variants) for (const c of cabinsFor(trip, legs[0])) {
+        jobs.push({type: 'flights', purpose: 'multicity', variant: v.variant, legIdx: v.ls.map((l) => legs.indexOf(l)), q: {multi: enc(v.ls), cabin: c, adults: trip.adults, long: 1}});
+      }
+    }
     stopsOf(trip, place).forEach((s, i) => jobs.push({type: 'hotels', stop: i, q: {city: s.city, country: s.country, checkin: s.checkin, checkout: s.checkout, adults: trip.adults, max: trip.nightly || 0}}));
     if (returnsHome(legs) && trip.strategies !== false) {
       const first = legs[0], last = legs[legs.length - 1];
@@ -215,7 +226,7 @@
         const needsHop = first.to !== last.from;
         if (needsHop && !h) continue;
         strategies.push({name: `Round trip ${first.from} ⇄ ${r.job.hub}` + (needsHop ? ` + ${h.from} → ${h.to} hop` : ''), cabin: rt.cabin,
-          total: rt.price + (needsHop ? h.price : 0) + midCost, parts: [rt, ...(needsHop ? [h] : []), ...middle], hub: r.job.hub, sample: !!r.data.sample});
+          total: rt.price + (needsHop ? h.price : 0) + midCost, stay: cheapest ? cheapest.stay : 0, parts: [rt, ...(needsHop ? [h] : []), ...middle], hub: r.job.hub, sample: !!r.data.sample});
       }
     }
 
@@ -237,22 +248,57 @@
       saves: baseline ? baseline.cost - p.cost : 0, overBudget: trip.budget ? p.cost > trip.budget : false, reasons: explain(p),
       hours: Math.round(p.picks.reduce((t, o) => t + o.durationMin, 0) / 60), sample: p.picks.some((o) => o.sample)});
 
+    const anySeat = bestPath((o) => o.price);
     const picks = [
       pack('baseline', 'Your exact plan', baseline, 'Your dates, airports and seats, cheapest fare on each leg.'),
-      pack('cheapest', 'Cheapest overall', cheapest, 'Lowest total across nearby dates, nearby airports and ground options.'),
+      anySeat && cheapest && anySeat.cost < cheapest.cost - 1 ? pack('anyseat', 'Cheapest in any seat class', anySeat, 'Ignores your seat choice to show the lowest possible price.') : null,
+      pack('cheapest', 'Cheapest with flexible dates', cheapest, 'Separate tickets, lowest total across nearby dates, nearby airports and ground options.'),
       pack('value', 'Best value', value, 'Balances price against travel time and stops.'),
       pack('comfort', 'Most comfort within budget', comfort, 'Highest seat class that keeps the whole trip under your budget.'),
     ].filter(Boolean);
+    // One multi-city ticket (+ ground for any legs left out) + the stays on your dates.
+    const stayCost = stayPick.reduce((t, sp) => t + (sp.cheapest ? sp.stop.nights * sp.cheapest.pricePerNight * Math.ceil((trip.adults || 1) / 2) : 0), 0);
+    for (const r of res.flights.filter((x) => x.job.purpose === 'multicity' && x.data?.offers?.length)) {
+      const t = r.data.offers[0], skipped = legs.map((l, i) => i).filter((i) => !r.job.legIdx.includes(i));
+      const ground = skipped.map((i) => opts[i].filter((o) => o.kind === 'ground' && o.date === legs[i].date).sort((a, b) => a.price - b.price)[0]);
+      if (ground.some((g) => !g)) continue;
+      strategies.push({name: skipped.length ? `One ticket for the flights + ${ground.map((g) => g.mode.toLowerCase()).join(' + ')} for ${skipped.map((i) => `${legs[i].from}→${legs[i].to}`).join(', ')}` : 'One multi-city ticket for every flight',
+        cabin: t.cabin, total: t.price + ground.reduce((a, g) => a + g.price, 0) + stayCost, stay: stayCost, parts: [t, ...ground], multicity: true, sample: !!r.data.sample});
+    }
     strategies.sort((a, b) => a.total - b.total);
     const sepByCabin = {};
     strategies.forEach((s) => {
-      if (!(s.cabin in sepByCabin)) {
-        const p = bestPath((o) => o.price, (o) => (o.leg === 0 || o.leg === legs.length - 1) ? (o.kind === 'flight' && o.cabin === s.cabin && o.date === legs[o.leg].date) : (o.kind === 'ground' || o.cabin === legs[o.leg].cabin));
-        sepByCabin[s.cabin] = p ? p.cost : null;
+      const k = `${s.cabin}|${!!s.multicity}`;
+      if (!(k in sepByCabin)) {
+        // Same seat class, same dates, each flight bought on its own (ground allowed where the strategy uses it).
+        const p = s.multicity
+          ? bestPath((o) => o.price, (o) => o.date === legs[o.leg].date && (o.kind === 'ground' || o.cabin === s.cabin))
+          : bestPath((o) => o.price, (o) => (o.leg === 0 || o.leg === legs.length - 1) ? (o.kind === 'flight' && o.cabin === s.cabin && o.date === legs[o.leg].date) : (o.kind === 'ground' || o.cabin === legs[o.leg].cabin));
+        sepByCabin[k] = p ? p.cost : null;
       }
-      s.separate = sepByCabin[s.cabin];
+      s.separate = sepByCabin[k];
       s.vsSeparate = s.separate != null ? s.separate - s.total : null;
     });
+    // Promote the best ticket combinations to smart picks when they beat the per-leg picks.
+    const asPick = (id, title, blurb, st) => ({id, title, blurb, total: st.total, flights: st.total - (st.stay || 0), stay: st.stay || 0, picks: st.parts,
+      saves: baseline ? baseline.cost - st.total : 0, overBudget: trip.budget ? st.total > trip.budget : false,
+      reasons: [`Book: ${st.name}${st.cabin !== legs[0].cabin ? ` (${CABIN_NAME[st.cabin]})` : ''}`], hours: Math.round(st.parts.reduce((t, o) => t + (o.durationMin || 0), 0) / 60), sample: !!st.sample, strategy: true});
+    const inCabin = strategies.find((st) => st.cabin === legs[0].cabin);
+    if (inCabin && (!cheapest || inCabin.total < cheapest.cost)) picks.splice(1, 0, asPick('ticket', 'Cheapest ticket combination', 'Fewer, smarter tickets in your seat class: airlines often price these below separate flights.', inCabin));
+    const anyStrat = strategies[0];
+    if (anyStrat && anyStrat !== inCabin && (!anySeat || anyStrat.total < anySeat.cost)) picks.splice(1, 0, asPick('anyticket', 'Lowest price, any seat class', 'The cheapest way found to do this trip, whatever the seat.', anyStrat));
+    // Comfort: a one-ticket fare in a higher class can fit the budget when separate tickets can't.
+    if (trip.budget) {
+      const fit = strategies.filter((st) => st.total <= trip.budget).sort((a, b) => GRADE[b.cabin] - GRADE[a.cabin] || a.total - b.total)[0];
+      const ci = picks.findIndex((p) => p.id === 'comfort');
+      const longGrade = (p) => Math.min(...p.picks.filter((o) => o.kind === 'flight' && (o.durationMin || 0) > 360).map((o) => GRADE[o.cabin] || 1), 9);
+      if (fit && (ci === -1 || GRADE[fit.cabin] > longGrade(picks[ci]))) {
+        const cp = asPick('comfort', 'Most comfort within budget', 'Highest seat class that keeps the whole trip under your budget.', fit);
+        if (ci === -1) picks.push(cp); else picks[ci] = cp;
+      }
+    }
+    const anyIdx = picks.findIndex((p) => p.id === 'anyseat');
+    if (anyIdx > -1 && anyStrat && anyStrat.total < picks[anyIdx].total) picks.splice(anyIdx, 1);
 
     // Date insights from the calendar.
     const dateInsights = legs.map((l, i) => {

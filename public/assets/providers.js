@@ -23,7 +23,11 @@ const gf = (from, to, date, cabin, ret) => {
 };
 const kayak = (from, to, date, cabin, ret) =>
   `https://www.kayak.com/flights/${from}-${to}/${date}${ret ? '/' + ret : ''}${{business: '/business', premium: '/premium', first: '/first'}[cabin] || ''}?sort=price_a`;
-export const bookLink = (o) => (o.cabin === 'premium' ? kayak : gf)(o.from, o.to, o.date, o.cabin, o.ret);
+const kayakMulti = (multi, cabin) =>
+  `https://www.kayak.com/flights/${multi.map((m) => `${m.from}-${m.to}/${m.date}`).join('/')}${{business: '/business', premium: '/premium', first: '/first'}[cabin] || ''}?sort=price_a`;
+export const bookLink = (o) => o.multi ? kayakMulti(o.multi, o.cabin) : (o.cabin === 'premium' ? kayak : gf)(o.from, o.to, o.date, o.cabin, o.ret);
+/* q.multi = [{from, to, date}, ...] searches the whole trip as one multi-city ticket. */
+export const parseMulti = (s) => (s || '').split(',').filter(Boolean).map((x) => { const [from, to, ...d] = x.split('-'); return {from: (from || '').toUpperCase(), to: (to || '').toUpperCase(), date: d.join('-')}; });
 
 const isoDur = (s) => { // PT14H15M -> minutes
   const m = /P(?:(\d+)D)?T?(?:(\d+)H)?(?:(\d+)M)?/.exec(s || '') || [];
@@ -32,8 +36,8 @@ const isoDur = (s) => { // PT14H15M -> minutes
 
 /* ---------------- Duffel: live airline offers ---------------- */
 export async function duffelFlights(env, q) {
-  const slices = [{origin: q.from, destination: q.to, departure_date: q.date}];
-  if (q.ret) slices.push({origin: q.to, destination: q.from, departure_date: q.ret});
+  const slices = q.multi ? q.multi.map((m) => ({origin: m.from, destination: m.to, departure_date: m.date})) : [{origin: q.from, destination: q.to, departure_date: q.date}];
+  if (q.ret && !q.multi) slices.push({origin: q.to, destination: q.from, departure_date: q.ret});
   const res = await fetch('https://api.duffel.com/air/offer_requests?return_offers=true&supplier_timeout=15000', {
     method: 'POST',
     headers: {'Authorization': `Bearer ${env.DUFFEL_TOKEN}`, 'Duffel-Version': 'v2', 'Content-Type': 'application/json', 'Accept': 'application/json'},
@@ -50,7 +54,7 @@ export async function duffelFlights(env, q) {
       flightNumbers: segs.map((s) => `${s.marketing_carrier?.iata_code || ''}${s.marketing_carrier_flight_number || ''}`),
       depart: first.segments[0].departing_at, arrive: first.segments[first.segments.length - 1].arriving_at,
       durationMin: o.slices.reduce((t, s) => t + isoDur(s.duration), 0), stops: Math.max(...o.slices.map((s) => s.segments.length - 1)),
-      cabin: q.cabin, from: q.from, to: q.to, date: q.date, ret: q.ret || null,
+      cabin: q.cabin, from: q.from, to: q.to, date: q.date, ret: q.ret || null, multi: q.multi || null,
       segments: segs.map((s) => ({from: s.origin.iata_code, to: s.destination.iata_code, depart: s.departing_at, arrive: s.arriving_at, carrier: s.marketing_carrier?.name, number: s.marketing_carrier_flight_number})),
       bookUrl: null,
     };
@@ -59,9 +63,15 @@ export async function duffelFlights(env, q) {
 
 /* ---------------- SerpApi: Google Flights results + price insights ---------------- */
 export async function serpFlights(env, q) {
-  const p = new URLSearchParams({engine: 'google_flights', departure_id: q.from, arrival_id: q.to, outbound_date: q.date,
-    type: q.ret ? '1' : '2', travel_class: String(CABIN.serp[q.cabin] || 1), adults: String(q.adults || 1), currency: 'USD', hl: 'en', api_key: env.SERPAPI_KEY});
-  if (q.ret) p.set('return_date', q.ret);
+  const p = new URLSearchParams({engine: 'google_flights', travel_class: String(CABIN.serp[q.cabin] || 1), adults: String(q.adults || 1), currency: 'USD', hl: 'en', api_key: env.SERPAPI_KEY});
+  if (q.multi) {
+    // Google shows the whole multi-city ticket price on the first-leg choices.
+    p.set('type', '3');
+    p.set('multi_city_json', JSON.stringify(q.multi.map((m) => ({departure_id: m.from, arrival_id: m.to, date: m.date}))));
+  } else {
+    p.set('type', q.ret ? '1' : '2'); p.set('departure_id', q.from); p.set('arrival_id', q.to); p.set('outbound_date', q.date);
+    if (q.ret) p.set('return_date', q.ret);
+  }
   const res = await fetch('https://serpapi.com/search.json?' + p);
   if (!res.ok) throw new Error(`SerpApi ${res.status}`);
   const b = await res.json();
@@ -71,7 +81,7 @@ export async function serpFlights(env, q) {
     airline: f.flights?.[0]?.airline, airlines: [...new Set((f.flights || []).map((s) => s.airline))],
     flightNumbers: (f.flights || []).map((s) => s.flight_number), depart: f.flights?.[0]?.departure_airport?.time,
     arrive: f.flights?.[f.flights.length - 1]?.arrival_airport?.time, durationMin: f.total_duration, stops: (f.flights || []).length - 1,
-    cabin: q.cabin, from: q.from, to: q.to, date: q.date, ret: q.ret || null,
+    cabin: q.cabin, from: q.from, to: q.to, date: q.date, ret: q.ret || null, multi: q.multi || null,
     segments: (f.flights || []).map((s) => ({from: s.departure_airport?.id, to: s.arrival_airport?.id, depart: s.departure_airport?.time, arrive: s.arrival_airport?.time, carrier: s.airline, number: s.flight_number})),
     bookUrl: null,
   }));
@@ -161,6 +171,16 @@ function baseFare(from, to, region) {
   return long ? 620 : 120;
 }
 export function demoFlights(q, region = {from: 'x', to: 'y'}) {
+  if (q.multi) { // one ticket is usually much cheaper than the same flights bought separately
+    const parts = q.multi.map((m) => demoFlights({...q, multi: null, from: m.from, to: m.to, date: m.date}, {from: 'a', to: m === q.multi[0] || m === q.multi[q.multi.length - 1] ? 'b' : 'a'})[0].price);
+    const sum = parts.reduce((a, b) => a + b, 0);
+    return Array.from({length: 5}, (_, i) => {
+      const r = hash(`${q.multi.map((m) => m.from + m.to + m.date).join()}${q.cabin}${i}`);
+      return {provider: 'Sample', price: Math.round(sum * (0.55 + r * 0.25)), currency: 'USD', airline: ['Korean Air', 'Cathay Pacific', 'Asiana', 'United', 'Delta'][i],
+        airlines: [], flightNumbers: [], depart: q.multi[0].date, arrive: null, durationMin: 1900 + Math.round(r * 900), stops: 1 + Math.floor(r * 2),
+        cabin: q.cabin, from: q.multi[0].from, to: q.multi[q.multi.length - 1].to, date: q.multi[0].date, ret: null, multi: q.multi, segments: [], bookUrl: null};
+    }).sort((a, b) => a.price - b.price);
+  }
   const dow = new Date(q.date + 'T00:00:00Z').getUTCDay();
   const base = baseFare(q.from, q.to, region) * CABIN_MULT[q.cabin || 'economy'] * DOW[dow] * (q.ret ? 1.85 : 1);
   const airlines = ['Korean Air', 'Cathay Pacific', 'United', 'ANA', 'EVA Air', 'Delta', 'Air Canada', 'Asiana', 'Japan Airlines', 'Philippine Airlines'];

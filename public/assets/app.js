@@ -1,5 +1,5 @@
 /* RouteHound app: runs the price searches, asks the engine for smart picks, and renders results. */
-import {demoFlights, demoCalendar, demoHotels, bookLink} from './providers.js';
+import {demoFlights, demoCalendar, demoHotels, bookLink, parseMulti} from './providers.js';
 
 const E = window.RHEngine, RH = window.RH;
 const $ = (s, r = document) => r.querySelector(s);
@@ -50,7 +50,7 @@ const regionOf = (q) => ({from: q.long ? 'a' : 'x', to: q.long ? 'b' : 'x'});
 async function call(job) {
   const q = job.q;
   if (!backend) {
-    if (job.type === 'flights') return {offers: demoFlights(q, regionOf(q)).map((o) => ({...o, bookUrl: bookLink(o)})), sample: true};
+    if (job.type === 'flights') { const qq = q.multi ? {...q, multi: parseMulti(q.multi)} : q; return {offers: demoFlights(qq, regionOf(qq)).map((o) => ({...o, bookUrl: bookLink(o)})), sample: true}; }
     if (job.type === 'calendar') return {days: demoCalendar(q, regionOf(q)), sample: true};
     return {hotels: demoHotels({...q, nights: nights(q.checkin, q.checkout), maxNight: q.max}), sample: true};
   }
@@ -152,14 +152,14 @@ function renderResults() {
 
   // Strategies
   if (rec.strategies.length) {
-    const t = el('table', {class: 'tbl'}, el('thead', {}, el('tr', {}, ['Strategy', 'Seat on long flights', 'Trip flights + stays', 'vs separate one-ways', ''].map((h) => el('th', {text: h})))));
+    const t = el('table', {class: 'tbl'}, el('thead', {}, el('tr', {}, ['Strategy', 'Seat class', 'Trip total with stays', 'vs separate tickets', ''].map((h) => el('th', {text: h})))));
     const tb = el('tbody');
     rec.strategies.forEach((s) => tb.append(el('tr', {},
       el('td', {text: s.name}), el('td', {text: CABINS[s.cabin]}), el('td', {class: 'num', text: usd(s.total)}),
       el('td', {class: 'num ' + (s.vsSeparate > 0 ? 'good' : ''), text: s.vsSeparate == null ? '—' : s.vsSeparate > 0 ? `saves ${usd(s.vsSeparate)}` : `${usd(-s.vsSeparate)} more`}),
-      el('td', {}, link('Book round trip', s.parts[0].bookUrl || bookLink(s.parts[0]), 'chip small')))));
+      el('td', {}, link(s.multicity ? 'Book ticket' : 'Book round trip', s.parts[0].bookUrl || bookLink(s.parts[0]), 'chip small')))));
     t.append(tb);
-    out.append(el('div', {class: 'section-h'}, el('div', {}, el('h2', {text: 'Ticket strategies'}), el('p', {class: 'muted', text: 'A round trip to one city plus a cheap regional hop, compared with booking each flight separately in the same seat class. Separate tickets aren’t protected if one is late, so leave a buffer day.'}))),
+    out.append(el('div', {class: 'section-h'}, el('div', {}, el('h2', {text: 'Ticket strategies'}), el('p', {class: 'muted', text: 'One multi-city ticket, or a round trip plus a cheap regional hop, compared with buying each flight separately in the same seat class. Separate tickets aren’t protected if one is late, so leave a buffer day.'}))),
       el('div', {class: 'scroll'}, t));
   }
 
@@ -178,8 +178,8 @@ function pickCard(p, rec) {
   const itin = el('ol', {class: 'itin'});
   p.picks.forEach((o) => itin.append(el('li', {},
     el('span', {class: 'itin-d', text: nice(o.date)}),
-    el('span', {class: 'code', text: `${o.from} → ${o.to}`}),
-    el('span', {class: 'muted', text: o.kind === 'ground' ? ` ${o.mode} · ${hrs(o.durationMin)} · typical fare` : ` ${o.airline || ''} · ${CABINS[o.cabin]} · ${o.stops === 0 ? 'nonstop' : o.stops + ' stop' + (o.stops > 1 ? 's' : '')} · ${hrs(o.durationMin)}`}),
+    el('span', {class: 'code', text: o.multi ? o.multi.map((m) => `${m.from}→${m.to}`).join(' · ') : o.ret ? `${o.from} ⇄ ${o.to}` : `${o.from} → ${o.to}`}),
+    el('span', {class: 'muted', text: o.multi ? ` one ticket · ${o.airline || ''} · ${CABINS[o.cabin]}` : o.kind === 'ground' ? ` ${o.mode} · ${hrs(o.durationMin)} · typical fare` : ` ${o.airline || ''} · ${CABINS[o.cabin]} · ${o.stops === 0 ? 'nonstop' : o.stops + ' stop' + (o.stops > 1 ? 's' : '')} · ${hrs(o.durationMin)}`}),
     el('span', {class: 'num', text: usd(o.price)}),
     link(o.kind === 'ground' ? 'Book' : 'Book', o.bookUrl || bookLink(o), 'chip small'))));
   rec.stays.forEach((sp) => {
@@ -333,4 +333,10 @@ bindForm(); renderLegs(); renderDeals(); renderTrends(); renderExplore(); render
 $('#family').addEventListener('change', renderExplore);
 $('#passport').addEventListener('change', renderEntry);
 $('#year').textContent = new Date().getFullYear();
-detectBackend().then(() => search());
+detectBackend().then((b) => {
+  const live = b && [b.flights?.duffel, b.flights?.googleFlights, b.hotels?.googleHotels, b.hotels?.liteapi].some(Boolean);
+  const badge = $('#live-badge');
+  badge.textContent = live ? 'Live prices' : 'Sample prices';
+  badge.className = 'pill ' + (live ? 'ok' : 'act');
+  search();
+});

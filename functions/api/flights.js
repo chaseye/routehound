@@ -1,6 +1,6 @@
 /* GET /api/flights?from=ORD&to=ICN&date=2027-01-08&cabin=business[&ret=2027-01-24][&adults=1][&long=1]
  * Live offers from Duffel and Google Flights (SerpApi), merged and sorted by price. Sample data when no keys are set. */
-import {duffelFlights, serpFlights, demoFlights, cached, json, has, okCode, okDate, bookLink} from '../../public/assets/providers.js';
+import {duffelFlights, serpFlights, demoFlights, cached, json, has, okCode, okDate, bookLink, parseMulti} from '../../public/assets/providers.js';
 
 export async function onRequestGet(context) {
   const {request, env} = context;
@@ -8,6 +8,11 @@ export async function onRequestGet(context) {
   const q = {from: (u.searchParams.get('from') || '').toUpperCase(), to: (u.searchParams.get('to') || '').toUpperCase(),
     date: u.searchParams.get('date'), ret: u.searchParams.get('ret') || null, cabin: u.searchParams.get('cabin') || 'economy',
     adults: Math.min(9, Math.max(1, +u.searchParams.get('adults') || 1))};
+  const multi = parseMulti(u.searchParams.get('multi'));
+  if (multi.length) {
+    if (multi.length < 2 || multi.length > 6 || multi.some((m) => !okCode(m.from) || !okCode(m.to) || !okDate(m.date))) return json({error: 'Multi-city needs 2–6 legs like ORD-ICN-2027-01-08.'}, 400);
+    Object.assign(q, {multi, from: multi[0].from, to: multi[multi.length - 1].to, date: multi[0].date, ret: null});
+  }
   if (!okCode(q.from) || !okCode(q.to) || !okDate(q.date) || (q.ret && !okDate(q.ret))) return json({error: 'Use 3-letter airport codes and YYYY-MM-DD dates.'}, 400);
   if (!['economy', 'premium', 'business', 'first'].includes(q.cabin)) return json({error: 'Unknown cabin.'}, 400);
 
