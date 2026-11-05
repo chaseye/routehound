@@ -1,0 +1,17 @@
+name: Track saved trip prices
+# Daily at 6:41 AM Chicago (12:41 UTC). Each saved trip uses 1 price search per day.
+on:
+  schedule:
+    - cron: '41 12 * * *'
+  workflow_dispatch:
+jobs:
+  track:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Re-price saved trips and send alerts
+        env:
+          SITE_URL: ${{ vars.SITE_URL || 'https://routehound.pages.dev' }}
+          TRACK_SECRET: ${{ secrets.TRACK_SECRET }}
+        run: |
+          if [ -z "$TRACK_SECRET" ]; then echo "TRACK_SECRET not set; skipping."; exit 0; fi
+          curl -sS -f -X POST "$SITE_URL/api/track/run?limit=8" -H "Authorization: Bearer $TRACK_SECRET"

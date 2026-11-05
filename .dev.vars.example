@@ -4,3 +4,10 @@ DUFFEL_TOKEN=duffel_test_xxx
 SERPAPI_KEY=xxx
 TRAVELPAYOUTS_TOKEN=xxx
 LITEAPI_KEY=sand_xxx
+
+# Accounts and price alerts
+RESEND_API_KEY=re_xxx
+EMAIL_FROM=RouteHound <alerts@yourdomain.com>
+TRACK_SECRET=any-long-random-string
+# Local testing only: print emails to the console instead of sending (never set in production)
+# DEV_EMAIL_LOG=1

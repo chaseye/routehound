@@ -145,6 +145,8 @@ function renderResults() {
     el('span', {text: sample ? ' — this copy isn’t connected to price sources yet, so numbers are realistic examples. Book links open real searches.' : ` from ${srcs.join(', ')}, checked ${at.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'})}. Fares change often; confirm on the booking site.`})));
   if (res.errors.length) out.append(el('p', {class: 'small warn', text: `${res.errors.length} search${res.errors.length > 1 ? 'es' : ''} failed and were skipped.`}));
 
+  out.append(trackCard());
+
   // Smart picks
   out.append(el('div', {class: 'section-h'}, el('div', {}, el('h2', {text: 'Smart picks'}), el('p', {class: 'muted', text: trip.includeStays === false ? 'Totals per person for flights and rides only. Each pick says what it changes from your plan.' : 'Whole-trip totals per person: flights, trains and stays. Each pick says what it changes from your plan.'}))));
   const grid = el('div', {class: 'picks'});
@@ -333,10 +335,97 @@ function renderEntry() {
   }));
 }
 
+/* ---------- Accounts and price tracking ---------- */
+let me = null; // {available, email}
+async function loadMe() {
+  try { me = await fetch('/api/me', {cache: 'no-store'}).then((r) => r.ok ? r.json() : {available: false}); } catch (e) { me = {available: false}; }
+  const a = $('#acct-link'); if (a) a.textContent = me?.email ? 'My trips' : 'Sign in';
+  return me;
+}
+const api = async (path, opts = {}) => {
+  const r = await fetch(path, {...opts, headers: {'Content-Type': 'application/json', ...(opts.headers || {})}, credentials: 'same-origin'});
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw Object.assign(new Error(d.error || `HTTP ${r.status}`), {status: r.status});
+  return d;
+};
+function signInForm(note) {
+  const msg = el('p', {class: 'small', role: 'status'});
+  const email = el('input', {id: 'signin-email', type: 'email', required: '', autocomplete: 'email', placeholder: 'you@example.com'});
+  const trap = el('input', {id: 'signin-website', name: 'website', tabindex: '-1', autocomplete: 'off', class: 'hp', 'aria-hidden': 'true'});
+  const btn = el('button', {type: 'submit', class: 'primary', text: 'Email me a sign-in link'});
+  const form = el('form', {class: 'signin', onsubmit: async (e) => {
+    e.preventDefault(); btn.disabled = true; msg.className = 'small'; msg.textContent = 'Sending…';
+    try {
+      await api('/api/auth/start', {method: 'POST', body: JSON.stringify({email: email.value, website: trap.value})});
+      msg.textContent = `Check ${email.value} for a link from RouteHound. It works once and expires in 15 minutes.`;
+    } catch (err) { msg.className = 'small warn'; msg.textContent = err.message; btn.disabled = false; }
+  }}, el('label', {class: 'field', for: 'signin-email'}, el('span', {class: 'lbl', text: 'Email'}), email), trap, btn);
+  return el('div', {}, note ? el('p', {class: 'small', text: note}) : null,
+    el('p', {class: 'muted', text: 'No password needed. We email you a one-time link to confirm the address is yours.'}), form, msg);
+}
+async function renderAccount() {
+  const box = $('#account-body');
+  box.replaceChildren(el('p', {class: 'muted', text: 'Loading…'}));
+  await loadMe();
+  const flag = new URLSearchParams(location.search).get('signin');
+  if (flag) history.replaceState(null, '', location.pathname + location.hash);
+  if (!me?.available) { box.replaceChildren(el('p', {class: 'muted', text: 'Accounts and price alerts are being set up. Check back soon.'})); return; }
+  if (!me.email) {
+    box.replaceChildren(signInForm(flag === 'expired' ? 'That link has expired or was already used. Send yourself a new one.' : flag === 'invalid' ? 'That link isn’t valid. Send yourself a new one.' : null));
+    return;
+  }
+  const list = el('div', {class: 'trips'}, el('p', {class: 'muted', text: 'Loading your trips…'}));
+  box.replaceChildren(
+    el('div', {class: 'acct-h'}, el('p', {}, flag === 'ok' ? el('strong', {text: 'Email verified. ', class: 'good'}) : null, 'Signed in as ', el('strong', {text: me.email})),
+      el('button', {type: 'button', class: 'ghost', text: 'Sign out', onclick: async () => { await api('/api/auth/logout', {method: 'POST'}).catch(() => {}); renderAccount(); }})),
+    list);
+  try {
+    const {trips} = await api('/api/trips');
+    if (!trips.length) { list.replaceChildren(el('p', {class: 'muted', text: 'No tracked trips yet. Run a search on Plan a trip, then choose “Track this trip”.'})); return; }
+    list.replaceChildren(...trips.map((t) => {
+      const hist = el('div', {class: 'hist'});
+      const change = t.best_price && t.last_price ? t.last_price - t.best_price : 0;
+      return el('article', {class: 'card trip-row'},
+        el('header', {class: 'card-h'}, el('h3', {text: t.name}), el('span', {class: 'pill', text: t.trip.legs.map((l) => nice(l.date)).join(' · ')})),
+        el('div', {class: 'trip-stats'},
+          el('div', {}, el('span', {class: 'lbl', text: 'Latest price'}), el('strong', {class: 'big-s', text: usd(t.last_price)})),
+          el('div', {}, el('span', {class: 'lbl', text: 'Lowest seen'}), el('strong', {text: usd(t.best_price)}), change > 0 ? el('span', {class: 'muted small', text: ` (now ${usd(change)} higher)`}) : null),
+          el('div', {}, el('span', {class: 'lbl', text: 'Your target'}), el('strong', {text: t.target_price ? usd(t.target_price) : '—'})),
+          el('div', {}, el('span', {class: 'lbl', text: 'Last checked'}), el('span', {text: t.last_checked ? new Date(t.last_checked).toLocaleString([], {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'}) : 'Pending'}))),
+        el('div', {class: 'chips'},
+          el('button', {type: 'button', class: 'small-btn', text: 'Price history', onclick: async () => {
+            const {history: h} = await api(`/api/trips?history=${encodeURIComponent(t.id)}`);
+            hist.replaceChildren(h.length ? el('table', {class: 'tbl compact'}, el('tbody', {}, h.slice().reverse().map((r) => el('tr', {},
+              el('td', {text: new Date(r.checked_at).toLocaleDateString([], {weekday: 'short', month: 'short', day: 'numeric'})}), el('td', {text: r.airline || ''}), el('td', {class: 'num', text: usd(r.price)}))))) : el('p', {class: 'muted small', text: 'No checks yet.'}));
+          }}),
+          el('button', {type: 'button', class: 'small-btn', text: 'Load into planner', onclick: () => { trip.legs = t.trip.legs; trip.adults = t.trip.adults; save(); renderLegs(); location.hash = '#plan'; }}),
+          el('button', {type: 'button', class: 'small-btn ghost', text: 'Stop tracking', onclick: async () => { await api(`/api/trips?id=${encodeURIComponent(t.id)}`, {method: 'DELETE'}); renderAccount(); }})),
+        hist);
+    }));
+  } catch (e) { list.replaceChildren(el('p', {class: 'warn', text: e.message})); }
+}
+function trackCard() {
+  const msg = el('span', {class: 'small', role: 'status'});
+  const target = el('input', {id: 'track-target', type: 'number', min: '0', step: '10', placeholder: 'Optional', class: 'narrow'});
+  const btn = el('button', {type: 'button', class: 'primary', text: 'Track this trip', onclick: async () => {
+    if (!me?.available) { msg.textContent = 'Price alerts are being set up. Check back soon.'; return; }
+    if (!me.email) { location.hash = '#account'; return; }
+    btn.disabled = true; msg.textContent = 'Saving and checking today’s price…';
+    try {
+      await api('/api/trips', {method: 'POST', body: JSON.stringify({trip: {legs: trip.legs.filter(valid), adults: trip.adults}, targetPrice: +target.value || null})});
+      msg.innerHTML = ''; msg.append('Tracking. ', el('a', {href: '#account', text: 'See your trips'}));
+    } catch (e) { msg.className = 'small warn'; msg.textContent = e.message; btn.disabled = false; }
+  }});
+  return el('section', {class: 'card track'},
+    el('div', {}, el('h3', {text: 'Watch this trip’s price'}), el('p', {class: 'muted small', text: 'We check every day and email you when it drops. Sign in with your email to start.'})),
+    el('div', {class: 'track-actions'}, el('label', {class: 'field', for: 'track-target'}, el('span', {class: 'lbl', text: 'Alert me under ($)'}), target), btn, msg));
+}
+
 /* ---------- Tabs & boot ---------- */
-const TABS = ['plan', 'deals', 'explore', 'entry', 'partners'];
+const TABS = ['plan', 'deals', 'explore', 'entry', 'partners', 'account'];
 function showTab() {
   const t = TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'plan';
+  if (t === 'account') renderAccount();
   TABS.forEach((id) => { $('#' + id).hidden = id !== t; });
   document.querySelectorAll('.tabs a').forEach((a) => a.setAttribute('aria-current', a.getAttribute('href') === '#' + t ? 'page' : 'false'));
 }
@@ -379,3 +468,4 @@ detectBackend().then((b) => {
   badge.className = 'pill ' + (live ? 'ok' : 'act');
 });
 renderExample();
+loadMe();

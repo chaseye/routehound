@@ -172,3 +172,20 @@ details summary{cursor:pointer;font-weight:650;margin-top:6px;color:var(--teal)}
 .muted-num{color:var(--muted);text-decoration:line-through;text-decoration-thickness:2px}
 .example-cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:14px 22px;border-top:1px dashed var(--line);background:var(--bg)}
 .example-cta p{margin:0;max-width:52ch}
+
+/* Accounts */
+.hp{position:absolute;left:-10000px;width:1px;height:1px;opacity:0}
+.signin{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin-top:10px}
+.signin .field{min-width:min(100%,18rem);flex:1}
+.acct-h{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;margin-bottom:12px}
+.acct-h p{margin:0}
+.trips{display:grid;gap:12px}
+.trip-row{margin:0}
+.trip-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,9rem),1fr));gap:10px;margin:10px 0}
+.big-s{font-family:var(--f-display);font-size:1.35rem;font-weight:800}
+.hist{margin-top:8px}
+.card.track{display:flex;flex-wrap:wrap;gap:12px;align-items:end;justify-content:space-between;border-left:4px solid var(--teal)}
+.card.track h3{margin:0}
+.card.track p{margin:4px 0 0}
+.track-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+input.narrow{width:9rem}

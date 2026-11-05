@@ -44,3 +44,20 @@ Your site is at `https://routehound.pages.dev` (or the name Cloudflare assigns).
 - Upgrade SerpApi (Starter $25/1,000 searches, Developer $75/5,000).
 - Switch Duffel to live and LiteAPI to production.
 - Add affiliate IDs (Travelpayouts, Booking.com, Expedia, Agoda) to the book links in `public/assets/data.js` and `public/assets/providers.js`.
+
+## 7. Accounts, email verification and price alerts
+
+1. **Database:** Cloudflare → Storage & Databases → D1 → Create database, name it `routehound`.
+   Then your Pages project → Settings → Bindings → Add → D1 database: Variable name `DB`, database `routehound`.
+   (Tables are created automatically on first use.)
+2. **Email:** sign up at https://resend.com → API Keys → Create. Add it in Cloudflare as Secret `RESEND_API_KEY`.
+   - Until you verify your own domain in Resend, emails only go to your own Resend account address (good for testing).
+   - To email everyone: buy a domain, verify it in Resend (Domains → Add), then add variable `EMAIL_FROM` = `RouteHound <alerts@yourdomain.com>`.
+3. **Daily price check:** make up a long random string. Add it in Cloudflare as Secret `TRACK_SECRET`,
+   and in GitHub → repo Settings → Secrets and variables → Actions → New secret `TRACK_SECRET` (same value).
+   If your site isn't `https://routehound.pages.dev`, add a GitHub variable `SITE_URL` with its address.
+4. **Daily deal on the home page:** add GitHub secret `SERPAPI_KEY` (same key as Cloudflare).
+5. Retry the latest deployment so the new settings apply.
+
+Security built in: one-time sign-in links (15 min, single use, stored hashed), HttpOnly/Secure/SameSite cookies,
+same-origin checks on every change, rate limits on sign-in requests, a hidden bot trap field, and no account-existence leaks.
