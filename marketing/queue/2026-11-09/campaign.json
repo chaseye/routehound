@@ -1,0 +1,185 @@
+{
+  "week": "2026-11-09",
+  "theme": "Plan the whole trip, not one flight",
+  "goal": "First 100 trip searches from social; learn whether 'whole trip' or 'shift a day' messaging gets more clicks.",
+  "why": "Holiday and winter-break trips are being booked now, and many of them are multi-city (visiting family abroad, big school-break trips). Each ad leads with one real feature so the tracked links show which one people want.",
+  "ads": [
+    {
+      "id": "whole",
+      "layout": "statement",
+      "theme": "dark",
+      "badge": "Free to use",
+      "headline": "Your whole trip, **sniffed out.**",
+      "sub": "Add every leg once. RouteHound compares flights, trains, ferries and stays, and says which way is smartest.",
+      "cta": "Plan a trip",
+      "formats": [
+        "story",
+        "square"
+      ]
+    },
+    {
+      "id": "picks",
+      "layout": "phone",
+      "screen": "picks",
+      "theme": "light",
+      "focus": "30%",
+      "headline": "Smart picks, in **plain words.**",
+      "sub": "Not endless results. A few picks for your whole trip, each with the reason it made the list.",
+      "cta": "Try the example trip",
+      "formats": [
+        "story"
+      ]
+    },
+    {
+      "id": "shift",
+      "layout": "phone",
+      "screen": "legs",
+      "theme": "dark",
+      "focus": "42%",
+      "headline": "Shift a day. **See the difference.**",
+      "sub": "Every leg shows fares by day, so you can see when another date is cheaper before you book.",
+      "cta": "Compare your dates"
+    },
+    {
+      "id": "how",
+      "layout": "list",
+      "screen": "plan",
+      "theme": "light",
+      "focus": "18%",
+      "headline": "One trip. **Every leg.**",
+      "bullets": [
+        "Add each city and date",
+        "Compare fares by day",
+        "Get picks with reasons"
+      ],
+      "cta": "Plan a trip"
+    }
+  ],
+  "videos": [
+    {
+      "id": "tour",
+      "intro": "whole",
+      "outro": "picks",
+      "path": "/",
+      "steps": [
+        {
+          "wait": 1000
+        },
+        {
+          "click": "text=Load example trip"
+        },
+        {
+          "wait": 1500
+        },
+        {
+          "click": "text=Sniff out prices"
+        },
+        {
+          "wait": 4500
+        },
+        {
+          "scroll": "h2:has-text('Smart picks')"
+        },
+        {
+          "scrollBy": -170
+        },
+        {
+          "wait": 2200
+        },
+        {
+          "scroll": "h2:has-text('Every leg, compared')"
+        },
+        {
+          "scrollBy": -170
+        },
+        {
+          "wait": 2200
+        },
+        {
+          "scrollBy": 600
+        },
+        {
+          "wait": 1600
+        }
+      ]
+    }
+  ],
+  "posts": [
+    {
+      "id": "fb-launch",
+      "channel": "facebook",
+      "ad": "whole",
+      "when": "2026-11-09T19:00:00-06:00",
+      "text": "Planning a trip with more than one stop? Most flight sites search one leg at a time.\n\nRouteHound lets you add the whole trip: every city and date. It compares flights, trains, ferries and stays, then gives you a few smart picks with the reason for each.\n\nFree to use. {link}"
+    },
+    {
+      "id": "fb-shift",
+      "channel": "facebook",
+      "ad": "shift",
+      "when": "2026-11-11T12:00:00-06:00",
+      "text": "Flexible by a day or two? RouteHound shows each leg's fares by day, so you can spot a cheaper date before you book.\n\nTry it with our example trip: {link}\n\n(Some links are affiliate links; it doesn't change your price.)"
+    },
+    {
+      "id": "fb-picks",
+      "channel": "facebook",
+      "ad": "picks",
+      "when": "2026-11-13T19:30:00-06:00",
+      "text": "You don't need 300 results. You need the few that make sense for your trip, and why.\n\nRouteHound's smart picks explain themselves in plain words. {link}"
+    },
+    {
+      "id": "ig-whole",
+      "channel": "instagram",
+      "ad": "whole",
+      "when": "2026-11-10T19:00:00-06:00",
+      "text": "Multi-city trip? Add every leg once. RouteHound compares flights, trains, ferries and stays and tells you the smartest way in plain words.\n\nFree to use. Link in bio.\n\n#travelplanning #multicitytrip #budgettravel #backpacking #traveltips"
+    },
+    {
+      "id": "ig-shift",
+      "channel": "instagram",
+      "ad": "shift",
+      "when": "2026-11-12T19:30:00-06:00",
+      "text": "Shift a day, see the difference. Every leg shows fares by day so you can spot a cheaper date. Link in bio.\n\n#traveltips #cheapflights #budgettravel #travelhacks"
+    },
+    {
+      "id": "ig-how",
+      "channel": "instagram",
+      "ad": "how",
+      "when": "2026-11-14T10:30:00-06:00",
+      "text": "How it works: add each city and date, compare fares by day, get picks with reasons. That's it. Link in bio.\n\n#travelplanning #roadtrip #interrail #studenttravel"
+    },
+    {
+      "id": "li-founder",
+      "channel": "linkedin",
+      "ad": "whole",
+      "when": "2026-11-10T08:00:00-06:00",
+      "text": "I built RouteHound because planning a multi-city trip still means a dozen tabs: one per flight, plus trains, ferries and hotels.\n\nRouteHound takes the whole trip at once and returns a few picks with plain-language reasons (\"this date is cheaper\", \"the train beats the flight here\").\n\nBuilt on Cloudflare Pages and D1, plain JS. Prices come from official partner APIs, and anything that isn't live is labeled as an example.\n\nIf you plan trips with more than one stop, I'd value your feedback: {link}"
+    },
+    {
+      "id": "rd-webdev",
+      "channel": "reddit",
+      "where": "r/webdev (Showoff Saturday thread only)",
+      "when": "2026-11-14T10:00:00-06:00",
+      "title": "Showoff Saturday: RouteHound, a multi-city trip planner in plain JS on Cloudflare Pages",
+      "text": "I built RouteHound to plan whole multi-city trips instead of one flight at a time.\n\nHow it's built:\n- Static site plus Pages Functions, D1 for trips and click tracking\n- The search planner runs in the browser; providers are shared with the API\n- No framework, no build step\n- Without API keys it shows clearly labeled example prices, so the demo works for anyone\n\nDisclosure: I made it, and booking links are affiliate links.\n\nI'd love feedback on the results page: is it clear which pick to choose and why? {link}"
+    },
+    {
+      "id": "tt-tour",
+      "channel": "tiktok",
+      "when": "2026-11-12T18:30:00-06:00",
+      "text": "POV: you plan a 3-city trip in one search instead of 12 tabs. #traveltok #travelhacks #budgettravel #multicitytrip",
+      "script": [
+        "0-2s: 12 open tabs, then cut to RouteHound (hook: \"Stop planning one flight at a time\")",
+        "2-6s: load the example trip, tap Sniff out prices",
+        "6-11s: scroll the smart picks and the fares-by-day grid",
+        "11-15s: end card: free to use, link in bio. Say on screen: example prices"
+      ]
+    },
+    {
+      "id": "grp-travel",
+      "channel": "group",
+      "where": "A budget-travel or backpacking Facebook group that allows tools (check the rules or ask the admin)",
+      "when": "2026-11-13T09:00:00-06:00",
+      "text": "Hi all, I made a free tool for multi-city trips and the rules allow sharing tools, so here it is.\n\nYou add every leg of the trip once, and RouteHound compares flights, trains, ferries and stays, with a short reason for each pick. It also shows fares by day for each leg.\n\nDisclosure: I built it and some booking links are affiliate links (no change to your price). Honest feedback very welcome: {link}"
+    }
+  ]
+}
