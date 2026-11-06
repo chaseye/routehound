@@ -36,7 +36,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .brand svg{width:34px;height:34px}
 .brand b{font-family:var(--f-display);font-size:1.35rem;font-weight:800;letter-spacing:-.01em}
 .tabs{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto}
-.tabs a{text-decoration:none;padding:7px 12px;border-radius:999px;font-weight:600;font-size:.93rem;color:var(--muted)}
+.tabs a{white-space:nowrap;flex:none;text-decoration:none;padding:7px 12px;border-radius:999px;font-weight:600;font-size:.93rem;color:var(--muted)}
 .tabs a[aria-current="page"]{background:var(--ink);color:var(--bg)}
 .tabs a:hover{color:var(--ink)}
 
@@ -107,7 +107,7 @@ footer p{max-width:70ch}
 @media (max-width:760px){
   .leg{grid-template-columns:1fr 1fr}
   .leg-n,.leg-city{grid-column:1/-1;padding:0}
-  .tabs{margin-left:0;width:100%;overflow-x:auto;flex-wrap:nowrap}
+  .tabs{margin-left:0;width:100%;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}
 }
 @media (prefers-reduced-motion:no-preference){.chip,.date{transition:border-color .15s}}
 

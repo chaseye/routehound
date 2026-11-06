@@ -1,0 +1,154 @@
+{
+  "name": "RouteHound",
+  "url": "https://routehound.pages.dev",
+  "displayUrl": "routehound.pages.dev",
+  "timezone": "America/Chicago",
+  "publicDir": "public",
+  "logo": "logo.svg",
+  "audience": "Budget-minded travelers planning multi-city and multi-country trips: backpackers, families visiting relatives abroad, digital nomads, students.",
+  "voice": "Savvy, upbeat, specific. A well-traveled friend who loves a smart route. Real examples over hype. Every price is labeled as an example unless it's live.",
+  "promise": "Plan a whole multi-city trip and see the cheapest smart way to fly, ride, sail and stay, with plain-language reasons.",
+  "facts": [
+    "free to use"
+  ],
+  "forbidden": [
+    "guaranteed lowest",
+    "lowest price guaranteed",
+    "always the cheapest",
+    "cheapest guaranteed",
+    "price match"
+  ],
+  "competitors": [
+    "Google Flights",
+    "Kayak",
+    "Skyscanner",
+    "Hopper",
+    "Expedia",
+    "Booking.com"
+  ],
+  "colors": {
+    "accent": "#FF8A4C",
+    "accent2": "#E2581C",
+    "accentInk": "#FFFFFF",
+    "accentShadow": "rgba(226,88,28,.38)",
+    "dark": {
+      "bg": "linear-gradient(160deg,#1B3A33,#13231E 62%,#0B1412)",
+      "bgSolid": "#0E1614",
+      "ink": "#EAF3EE",
+      "glow1": "rgba(255,122,61,.42)",
+      "glow2": "rgba(79,193,178,.42)",
+      "chip": "rgba(255,255,255,.12)",
+      "chipInk": "#FFB089"
+    },
+    "light": {
+      "bg": "linear-gradient(160deg,#FFF1E8,#F2F5F3 55%,#DDF0EB)",
+      "bgSolid": "#F2F5F3",
+      "ink": "#13231E",
+      "glow1": "#FFB48A",
+      "glow2": "#9ED9CF",
+      "chip": "#E2EEEA",
+      "chipInk": "#17786D"
+    }
+  },
+  "screens": {
+    "serve": {
+      "dir": "public"
+    },
+    "note": "Example prices",
+    "shots": [
+      {
+        "name": "plan",
+        "path": "/",
+        "steps": [
+          {
+            "click": "text=Load example trip"
+          },
+          {
+            "wait": 600
+          }
+        ]
+      },
+      {
+        "name": "picks",
+        "path": "/",
+        "steps": [
+          {
+            "click": "text=Load example trip"
+          },
+          {
+            "wait": 400
+          },
+          {
+            "click": "text=Sniff out prices"
+          },
+          {
+            "wait": 4500
+          },
+          {
+            "scroll": "h2:has-text('Smart picks')"
+          },
+          {
+            "scrollBy": -170
+          },
+          {
+            "wait": 500
+          }
+        ]
+      },
+      {
+        "name": "legs",
+        "path": "/",
+        "steps": [
+          {
+            "click": "text=Load example trip"
+          },
+          {
+            "wait": 400
+          },
+          {
+            "click": "text=Sniff out prices"
+          },
+          {
+            "wait": 4500
+          },
+          {
+            "scroll": "h2:has-text('Every leg, compared')"
+          },
+          {
+            "scrollBy": -170
+          },
+          {
+            "wait": 500
+          }
+        ]
+      },
+      {
+        "name": "stays",
+        "path": "/",
+        "steps": [
+          {
+            "click": "text=Load example trip"
+          },
+          {
+            "wait": 400
+          },
+          {
+            "click": "text=Sniff out prices"
+          },
+          {
+            "wait": 4500
+          },
+          {
+            "scroll": "h2:has-text('Where to stay')"
+          },
+          {
+            "scrollBy": -170
+          },
+          {
+            "wait": 500
+          }
+        ]
+      }
+    ]
+  }
+}
