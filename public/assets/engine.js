@@ -324,6 +324,47 @@
     const r2 = quick(trip) ? 0 : legs * ((trip.flex > 0 ? 2 : 0) + (trip.nearby ? 2 : 0));
     return r1 + r2;
   }
-  const api = {estimateLookups, planSearches, followUpSearches, recommend, stopsOf, groundFor, NEARBY, GROUND, addDays, nights, nice, dow, usd, GRADE};
+  /* ---------- Where each kind of price came from ----------
+   * Price sources are switched on one key at a time, so one search can mix live and sample prices
+   * (e.g. live Google Flights with sample fares-by-day when TRAVELPAYOUTS_TOKEN isn't set).
+   * res = the same shape recommend() takes. Sample items carry provider 'Sample'. */
+  function sourceSummary(res) {
+    const kind = (items) => {
+      const names = new Set(), out = {found: false, sample: false, sources: []};
+      for (const x of items) { if (!x) continue; out.found = true; if (x.provider === 'Sample' || x.sample) out.sample = true; else if (x.provider) names.add(x.provider); }
+      out.sources = [...names];
+      out.live = out.found && !out.sample;
+      return out;
+    };
+    const flights = kind((res.flights || []).flatMap((r) => r.data?.offers?.length ? r.data.offers.map((o) => ({provider: o.provider, sample: !!r.data.sample})) : []));
+    const calendar = kind(Object.values(res.calendar || {}).flat());
+    const hotels = kind(Object.values(res.hotels || {}).flat());
+    const parts = {flights, calendar, hotels};
+    const found = Object.values(parts).filter((p) => p.found);
+    const anySample = found.some((p) => p.sample), anyLive = found.some((p) => p.live);
+    const label = {flights: 'flights', hotels: 'stays', calendar: 'fares by day'};
+    return {...parts, anySample, anyLive, allSample: anySample && !anyLive, mixed: anySample && anyLive,
+      sampleParts: Object.keys(label).filter((k) => parts[k].sample).map((k) => label[k]),
+      liveParts: Object.keys(label).filter((k) => parts[k].live).map((k) => label[k])};
+  }
+  /* /api/status -> 'live' (flights, stays and fares by day all live), 'partial', or 'sample'. */
+  function liveLevel(status) {
+    if (!status) return 'sample';
+    const on = [status.flights?.duffel || status.flights?.googleFlights, status.hotels?.googleHotels || status.hotels?.liteapi, status.calendar?.aviasales].map(Boolean);
+    return on.every(Boolean) ? 'live' : on.some(Boolean) ? 'partial' : 'sample';
+  }
+  /* Cached answers keep the time they were really fetched; report the oldest so "checked at" is honest. */
+  function oldestCheck(times, fallback = new Date()) {
+    const ms = (times || []).map((t) => Date.parse(t)).filter(Number.isFinite);
+    return ms.length ? new Date(Math.min(...ms)) : fallback;
+  }
+  function ago(then, now = new Date()) {
+    const min = Math.max(0, Math.round((now - then) / 6e4));
+    if (min < 2) return 'just now';
+    if (min < 60) return `${min} min ago`;
+    const h = Math.round(min / 60);
+    return h < 48 ? `about ${h} h ago` : `${Math.round(h / 24)} days ago`;
+  }
+  const api = {sourceSummary, liveLevel, oldestCheck, ago, estimateLookups, planSearches, followUpSearches, recommend, stopsOf, groundFor, NEARBY, GROUND, addDays, nights, nice, dow, usd, GRADE};
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.RHEngine = api;
 })(typeof window !== 'undefined' ? window : globalThis);

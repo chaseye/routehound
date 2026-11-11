@@ -128,11 +128,12 @@ async function search() {
   const r1 = E.planSearches(trip, place);
   let total = r1.length, done = 0;
   const tick = () => { done++; bar.firstChild.style.width = `${Math.round(done / total * 100)}%`; msg.textContent = `Checked ${done} of ${total} price searches…`; };
-  const res = {flights: [], calendar: {}, hotels: {}, errors: [], long: {}};
+  const res = {flights: [], calendar: {}, hotels: {}, errors: [], long: {}, checked: []};
   legs.forEach((l, i) => { res.long[i] = place(l.from).region !== place(l.to).region ? 1 : 0; });
   const absorb = (rows) => rows.forEach(({job, data, error}) => {
     if (error) res.errors.push(`${job.type} ${job.q.from || job.q.city || ''}${job.q.to ? '→' + job.q.to : ''}: ${error}`);
     if (!data) return;
+    if (data.checkedAt && !data.sample) res.checked.push(data.checkedAt); // edge-cached answers keep their real check time
     if (job.type === 'flights') res.flights.push({job, data});
     else if (job.type === 'calendar') res.calendar[job.leg] = [...(res.calendar[job.leg] || []), ...(data.days || [])];
     else res.hotels[job.stop] = data.hotels || [];
@@ -142,7 +143,7 @@ async function search() {
   total += r2.length;
   absorb(await runAll(r2, tick));
   const rec = E.recommend(trip, res, place);
-  lastRun = {res, rec, at: new Date(), sample: !backend || res.flights.some((f) => f.data?.sample)};
+  lastRun = {res, rec, at: E.oldestCheck(res.checked), sample: !backend || res.flights.some((f) => f.data?.sample), sources: E.sourceSummary(res)};
   btn.disabled = false;
   renderResults();
   renderExplore(); renderEntry();
@@ -150,13 +151,21 @@ async function search() {
 
 /* ---------- Results ---------- */
 function renderResults() {
-  const {res, rec, at, sample} = lastRun, out = $('#plan-out');
+  const {res, rec, at, sample, sources: src = E.sourceSummary(res)} = lastRun, out = $('#plan-out');
   out.replaceChildren();
   if (!rec) return;
   const srcs = backend ? [backend.flights?.duffel && 'Duffel', backend.flights?.googleFlights && 'Google Flights', backend.calendar?.aviasales && 'Aviasales', backend.hotels?.googleHotels && 'Google Hotels', backend.hotels?.liteapi && 'LiteAPI'].filter(Boolean) : [];
-  out.append(el('div', {class: 'banner ' + (sample ? 'warn-b' : 'ok-b')},
+  const checked = `checked ${at.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'})}${E.ago(at) === 'just now' ? '' : ` (${E.ago(at)})`}`;
+  const list = (a) => a.length > 1 ? `${a.slice(0, -1).join(', ')} and ${a.at(-1)}` : a.join('');
+  if (src.mixed) {
+    // Some sources are on and some aren't: say exactly which numbers are examples.
+    const liveNames = [...new Set([...src.flights.sources, ...src.hotels.sources, ...src.calendar.sources])];
+    out.append(el('div', {class: 'banner warn-b', 'data-src': 'mixed'},
+      el('strong', {text: 'Some prices are samples'}),
+      el('span', {text: ` — live ${list(src.liveParts)} from ${liveNames.join(', ')}, ${checked}. Sample (example) prices for ${list(src.sampleParts)}: those price sources aren’t connected yet, so ${src.flights.sample || src.hotels.sample ? 'totals that include them are estimates, not quotes' : 'treat them as examples'}. Book links open real searches.`})));
+  } else out.append(el('div', {class: 'banner ' + (sample ? 'warn-b' : 'ok-b')},
     el('strong', {text: sample ? 'Sample prices' : 'Live prices'}),
-    el('span', {text: sample ? ' — this copy isn’t connected to price sources yet, so numbers are realistic examples. Book links open real searches.' : ` from ${srcs.join(', ')}, checked ${at.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'})}. Fares change often; confirm on the booking site.`})));
+    el('span', {text: sample ? ' — this copy isn’t connected to price sources yet, so numbers are realistic examples. Book links open real searches.' : ` from ${srcs.join(', ')}, ${checked}. Fares change often; confirm on the booking site.`})));
   if (limitNote) out.append(el('div', {class: 'banner warn-b'}, el('strong', {text: 'Daily limit reached. '}), limitNote, ' ',
     me?.available && !me.email ? el('a', {href: '#account', text: 'Sign in for more'}) : null, ' Every result still has booking links you can open.'));
   else if (res.errors.length) out.append(el('p', {class: 'small warn', text: `${res.errors.length} search${res.errors.length > 1 ? 'es' : ''} failed and were skipped.`}));
@@ -194,6 +203,15 @@ function renderResults() {
   }
 }
 
+/* When live and sample prices are mixed, say on each pick which parts of its total are examples. */
+function samplePartsNote(p, rec) {
+  const src = lastRun?.sources;
+  if (!src?.mixed) return null;
+  const parts = [p.picks.some((o) => o.kind === 'flight' && (o.sample || o.provider === 'Sample')) ? 'flights' : null,
+    rec.stays.some((sp) => sp.cheapest) && src.hotels.sample ? 'stays' : null].filter(Boolean);
+  return parts.length ? el('p', {class: 'small warn', 'data-src': 'sample-note', text: `Includes sample prices for ${parts.join(' and ')}; not a real quote.`}) : null;
+}
+
 function pickCard(p, rec, heroId) {
   const itin = el('ol', {class: 'itin'});
   const stopsTxt = (o) => o.stops === 0 ? 'nonstop' : `${o.stops} stop${o.stops > 1 ? 's' : ''}`;
@@ -222,6 +240,7 @@ function pickCard(p, rec, heroId) {
     el('div', {class: 'big'}, usd(p.total)),
     el('p', {class: 'muted small', text: `Flights & rides ${usd(p.flights)} · Stays ${usd(p.stay)} · about ${p.hours} h in transit`}),
     p.overBudget ? el('p', {class: 'small warn', text: `Over your ${usd(trip.budget)} budget`}) : null,
+    samplePartsNote(p, rec),
     el('p', {class: 'small', text: p.blurb}),
     p.reasons.length ? el('ul', {class: 'reasons'}, p.reasons.map((r) => el('li', {text: r}))) : null,
     el('details', {}, el('summary', {text: 'See the full plan'}), itin));
@@ -238,12 +257,15 @@ function legCard(l, i, rec, res) {
     for (let k = -span; k <= span; k++) days.push(addDays(l.date, k));
     const byDate = Object.fromEntries(di.days.map((d) => [d.date, d.price]));
     const low = Math.min(...days.map((d) => byDate[d] ?? Infinity));
-    card.append(el('h4', {text: 'Cheapest economy fare by day'}), el('div', {class: 'dates'}, days.map((d) => {
+    const cal = lastRun?.sources?.calendar, mixed = lastRun?.sources?.mixed;
+    card.append(el('h4', {}, 'Cheapest economy fare by day', mixed && cal?.sample ? el('span', {class: 'tag', text: 'Sample prices'}) : null),
+      cal?.live ? el('p', {class: 'muted small', 'data-src': 'calendar', text: `From ${cal.sources.join(', ') || 'cached fare data'}: recent fares other travelers found, which can be a few days old. Open a date for today’s price.`}) : null,
+      el('div', {class: 'dates'}, days.map((d) => {
       const p = byDate[d];
       return link([el('span', {class: 'd', text: nice(d)}), el('span', {class: 'p', text: p ? usd(p) : '—'})], bookLink({from: l.from, to: l.to, date: d, cabin: l.cabin}),
         'date' + (d === l.date ? ' sel' : '') + (p === low ? ' best' : ''));
     })));
-    if (di.cheaperBy > 0) card.append(el('p', {class: 'small good', text: `${nice(di.low.date)} is ${usd(di.cheaperBy)} cheaper than your date in economy.`}));
+    if (di.cheaperBy > 0) card.append(el('p', {class: 'small good', text: `${nice(di.low.date)} is ${usd(di.cheaperBy)} cheaper than your date in economy${mixed && cal?.sample ? ' (sample prices)' : ''}.`}));
   }
   // Offers table: cheapest per cabin/date/airport
   const rows = res.flights.filter((r) => r.job.leg === i && r.data?.offers?.length);
@@ -262,7 +284,10 @@ function legCard(l, i, rec, res) {
       }
     });
     t.append(tb);
-    card.append(el('h4', {text: 'Flights found'}), el('div', {class: 'scroll'}, t));
+    const fsrc = [...new Set(rows.flatMap(({data}) => data.offers.map((o) => o.provider)).filter(Boolean))];
+    card.append(el('h4', {}, 'Flights found', lastRun?.sources?.mixed && fsrc.includes('Sample') ? el('span', {class: 'tag', text: 'Sample prices'}) : null),
+      !fsrc.includes('Sample') && fsrc.length ? el('p', {class: 'muted small', 'data-src': 'flights', text: `Source: ${fsrc.join(', ')}.`}) : null,
+      el('div', {class: 'scroll'}, t));
   }
   // Ground
   const g = rec.options[i].filter((o) => o.kind === 'ground' && o.date === l.date);
@@ -278,6 +303,9 @@ function stayCard(sp, i, res) {
   const s = sp.stop, hotels = res.hotels[i] || [];
   const card = el('section', {class: 'card stay', 'data-pl': 'stay'});
   card.append(el('header', {class: 'card-h'}, el('h3', {text: `Stay in ${s.city}`}), el('span', {class: 'pill', text: `${nice(s.checkin)} – ${nice(s.checkout)} · ${s.nights} night${s.nights > 1 ? 's' : ''}`})));
+  const hs = lastRun?.sources?.hotels;
+  if (lastRun?.sources?.mixed && hs?.sample) card.append(el('p', {class: 'small warn', 'data-src': 'sample-note', text: 'Sample prices: hotel price sources aren’t connected yet, so these stays and rates are examples, not real availability.'}));
+  else if (hs?.live && hs.sources.length) card.append(el('p', {class: 'muted small', 'data-src': 'hotels', text: `Source: ${hs.sources.join(', ')}.`}));
   if (sp.overCap) card.append(el('p', {class: 'small warn', text: `Nothing available under ${usd(trip.nightly)} a night for these dates; showing the cheapest available.`}));
   if (!hotels.length) card.append(el('p', {class: 'muted', text: 'No availability returned for these dates. Try the sites below.'}));
   const list = el('div', {class: 'hotels'});
@@ -494,10 +522,11 @@ async function renderExample() {
 }
 
 detectBackend().then((b) => {
-  const live = b && [b.flights?.duffel, b.flights?.googleFlights, b.hotels?.googleHotels, b.hotels?.liteapi].some(Boolean);
+  const level = E.liveLevel(b || null), live = level !== 'sample';
   const badge = $('#live-badge');
-  badge.textContent = live ? 'Live prices' : 'Sample prices';
-  badge.className = 'pill ' + (live ? 'ok' : 'act');
+  badge.textContent = level === 'partial' ? 'Partly live prices' : live ? 'Live prices' : 'Sample prices';
+  badge.className = 'pill ' + (level === 'live' ? 'ok' : 'act');
+  if (level === 'partial') badge.title = 'Some price sources are connected; results label which prices are samples.';
 });
 renderExample();
 loadMe();
