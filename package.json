@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node test/engine.test.mjs && node test/ledger.test.mjs && node test/marketing.test.mjs",
+    "test": "node test/engine.test.mjs && node test/ledger.test.mjs && node test/sources.test.mjs && node test/marketing.test.mjs",
     "dev": "npx wrangler pages dev public --compatibility-date=2026-10-01",
     "growth:screens": "node scripts/marketing/studio.mjs screens",
     "growth:new": "node scripts/marketing/studio.mjs new",
