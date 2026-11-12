@@ -148,6 +148,72 @@
             "wait": 500
           }
         ]
+      },
+      {
+        "name": "ground",
+        "path": "/",
+        "steps": [
+          {
+            "click": "text=Load example trip"
+          },
+          {
+            "wait": 400
+          },
+          {
+            "click": "text=Sniff out prices"
+          },
+          {
+            "wait": 4500
+          },
+          {
+            "scroll": "h4:has-text('Train, bus or ferry instead')"
+          },
+          {
+            "scrollBy": -215
+          },
+          {
+            "click": "h4:has-text('Train, bus or ferry instead')"
+          },
+          {
+            "wait": 500
+          }
+        ]
+      },
+      {
+        "name": "stay-sites",
+        "path": "/",
+        "steps": [
+          {
+            "click": "text=Load example trip"
+          },
+          {
+            "wait": 400
+          },
+          {
+            "click": "text=Sniff out prices"
+          },
+          {
+            "wait": 4500
+          },
+          {
+            "scroll": "article.hotel:has-text('Seoul Pearl Residence')"
+          },
+          {
+            "click": "article.hotel:has-text('Seoul Pearl Residence') >> text=Compare booking sites"
+          },
+          {
+            "wait": 300
+          },
+          {
+            "scroll": "article.hotel:has-text('Seoul Pearl Residence') strong"
+          },
+          {
+            "scrollBy": -210
+          },
+          {
+            "wait": 500
+          }
+        ]
       }
     ]
   }

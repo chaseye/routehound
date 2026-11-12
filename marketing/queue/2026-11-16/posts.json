@@ -1,0 +1,135 @@
+{
+  "week": "2026-11-16",
+  "theme": "Beyond flights: trains, ferries and stays in one plan",
+  "app": "RouteHound",
+  "url": "https://routehound.pages.dev",
+  "posts": [
+    {
+      "id": "fb-beyond",
+      "channel": "facebook",
+      "when": "2026-11-16T19:00:00-06:00",
+      "auto": true,
+      "skip": false,
+      "text": "A trip isn't just flights. Between cities there's often a train or a ferry, and every night you need a place to sleep.\n\nRouteHound puts all of it in one plan: flights for each leg, a train, bus or ferry option where one exists, and stays for your exact dates. Then it tells you which way makes the most sense, in plain words.\n\nFree to use. https://routehound.pages.dev/?utm_source=facebook&utm_medium=social&utm_campaign=2026-11-16-beyond-flights-trains-ferries&utm_content=fb-beyond",
+      "image": "ads/beyond-flights-portrait.jpg",
+      "publicImage": "/m/2026-11-16/beyond-flights-portrait.jpg"
+    },
+    {
+      "id": "fb-stays",
+      "channel": "facebook",
+      "when": "2026-11-18T12:00:00-06:00",
+      "auto": true,
+      "skip": false,
+      "text": "Set a nightly cap once, and RouteHound shows stays that are available for the exact nights of each stop, with the nightly and total price and whether cancellation is free.\n\nYou can also see each hotel's price on different booking sites before you pick one.\n\nTry it on the example trip: https://routehound.pages.dev/?utm_source=facebook&utm_medium=social&utm_campaign=2026-11-16-beyond-flights-trains-ferries&utm_content=fb-stays\n\n(Some booking links are affiliate links. They don't change your price.)",
+      "image": "ads/stays-your-dates-portrait.jpg",
+      "publicImage": "/m/2026-11-16/stays-your-dates-portrait.jpg"
+    },
+    {
+      "id": "fb-holiday",
+      "channel": "facebook",
+      "when": "2026-11-20T19:30:00-06:00",
+      "auto": true,
+      "skip": false,
+      "text": "Seeing family over winter break, with a stop or two along the way?\n\nAdd every city and date once. RouteHound checks the flights, any train or ferry between stops, and places to stay, then gives you a few picks with the reason for each.\n\nPrices change fast this time of year, so the booking site's price is always the final one. https://routehound.pages.dev/?utm_source=facebook&utm_medium=social&utm_campaign=2026-11-16-beyond-flights-trains-ferries&utm_content=fb-holiday",
+      "image": "ads/holiday-plan-portrait.jpg",
+      "publicImage": "/m/2026-11-16/holiday-plan-portrait.jpg"
+    },
+    {
+      "id": "ig-train",
+      "channel": "instagram",
+      "when": "2026-11-17T19:00:00-06:00",
+      "auto": true,
+      "skip": false,
+      "text": "Sometimes the smart leg isn't a flight.\n\nFor each leg, RouteHound shows a train, bus or ferry instead where one runs: Guangzhou to Hong Kong by high-speed train, London to Paris on the Eurostar, Athens to the islands by ferry. Typical fares and times, labeled as estimates.\n\nLink in bio.\n\n#traintravel #budgettravel #slowtravel #interrail #backpacking #travelplanning",
+      "image": "ads/train-instead-portrait.jpg",
+      "publicImage": "/m/2026-11-16/train-instead-portrait.jpg"
+    },
+    {
+      "id": "ig-stays",
+      "channel": "instagram",
+      "when": "2026-11-19T19:30:00-06:00",
+      "auto": true,
+      "skip": false,
+      "text": "Your flights and your stays, in the same plan.\n\nPick a nightly cap and RouteHound shows places available on the exact nights of each stop, with total price and free cancellation flagged. Compare one hotel across booking sites in a tap.\n\nFree to use. Link in bio.\n\n#hotels #budgettravel #travelplanning #multicitytrip #traveltips",
+      "image": "ads/stays-your-dates-portrait.jpg",
+      "publicImage": "/m/2026-11-16/stays-your-dates-portrait.jpg"
+    },
+    {
+      "id": "ig-holiday",
+      "channel": "instagram",
+      "when": "2026-11-21T12:00:00-06:00",
+      "auto": true,
+      "skip": false,
+      "text": "Winter break, visiting family, a couple of stops on the way? Plan it once: flights, trains or ferries between stops, and stays, with a plain reason for every pick.\n\nLink in bio.\n\n#wintertravel #holidaytravel #familytravel #travelplanning #budgettravel",
+      "image": "ads/holiday-plan-portrait.jpg",
+      "publicImage": "/m/2026-11-16/holiday-plan-portrait.jpg"
+    },
+    {
+      "id": "li-ground",
+      "channel": "linkedin",
+      "when": "2026-11-17T12:00:00-06:00",
+      "auto": false,
+      "skip": false,
+      "text": "A lesson from building RouteHound, my multi-city trip planner: the honest answer is sometimes \"don't fly this leg.\"\n\nFlight APIs only know about flights. But Guangzhou to Hong Kong, Seoul to Busan or Rome to Florence are often better by train, and some islands are better by ferry. So I added a small table of 30+ train, bus and ferry corridors with typical fares and times, and RouteHound shows them next to the flights for that leg.\n\nThe design choice I care about most: those fares are labeled \"typical fare\", not shown as live prices. Same with the demo: without live price sources, every number says it's an example. Being clear about what's live and what's an estimate matters more than looking complete.\n\nThe plan now covers flights, ground options and stays for your exact dates. If you're planning a winter trip with more than one stop, I'd value your feedback: https://routehound.pages.dev/?utm_source=linkedin&utm_medium=community&utm_campaign=2026-11-16-beyond-flights-trains-ferries&utm_content=li-ground",
+      "image": "ads/train-instead-landscape.jpg",
+      "publicImage": null
+    },
+    {
+      "id": "rd-sideproject",
+      "channel": "reddit",
+      "when": "2026-11-18T12:30:00-06:00",
+      "auto": false,
+      "skip": false,
+      "title": "I built a trip planner that treats trains, ferries and hotels as part of the route, not an afterthought",
+      "where": "r/SideProject (check the sidebar rules before posting; rules could not be verified automatically)",
+      "text": "I made RouteHound, a free planner for multi-city trips. You add every leg once, and for each leg it shows flights, plus a train, bus or ferry option where one exists (30+ corridors in Asia, Europe and Africa so far), plus stays for the exact nights of each stop under a nightly cap. Then it gives a few picks for the whole trip with a short reason for each.\n\nThings I'd like feedback on:\n- Ground options use typical fares and times and are labeled that way, not as live prices. Is that clear enough on the leg cards?\n- The stays section compares each hotel across booking sites. Useful, or too much on one page?\n- Which train or ferry routes should I add next?\n\nThere's an example trip (Chicago, Seoul, Guangzhou, Hong Kong) if you don't want to type your own. If the site isn't connected to live sources, numbers are labeled as examples.\n\nDisclosure: I built it, and booking links are affiliate links (they don't change your price). https://routehound.pages.dev/?utm_source=reddit&utm_medium=community&utm_campaign=2026-11-16-beyond-flights-trains-ferries&utm_content=rd-sideproject",
+      "image": "ads/beyond-flights-landscape.jpg",
+      "publicImage": null
+    },
+    {
+      "id": "tt-train",
+      "channel": "tiktok",
+      "when": "2026-11-19T18:30:00-06:00",
+      "auto": false,
+      "skip": false,
+      "script": [
+        "0-2s: hook on screen: \"Stop booking a flight for every leg\" over the RouteHound plan screen",
+        "2-5s: tap Load example trip (Chicago, Seoul, Guangzhou, Hong Kong), then Sniff out prices",
+        "5-10s: scroll to Every leg, compared and stop on the Guangzhou to Hong Kong leg's 'Train, bus or ferry instead' card",
+        "10-13s: scroll to Where to stay to show stays for the same dates",
+        "13-15s: takeaway on screen: \"Check the train before you fly the short hop.\" End card: free to use, link in bio. Small label: example prices, typical fares"
+      ],
+      "text": "Not every leg should be a flight. Here's how I check for a train or ferry first. #traintravel #traveltok #budgettravel #travelhacks #backpacking",
+      "image": null,
+      "publicImage": null
+    },
+    {
+      "id": "tt-stays",
+      "channel": "tiktok",
+      "when": "2026-11-22T19:00:00-06:00",
+      "auto": false,
+      "skip": false,
+      "script": [
+        "0-2s: hook on screen: \"Your flights are booked. Now 4 cities of hotels?\" over the stays screen",
+        "2-5s: set the nightly cap field on the plan screen, tap Sniff out prices",
+        "5-10s: scroll Where to stay: nightly and total price, free cancellation",
+        "10-13s: open one hotel's price across booking sites",
+        "13-15s: takeaway: \"Same plan, same dates, flights and stays together.\" End card: free to use, link in bio. Small label: example prices"
+      ],
+      "text": "Plan the hotels with the flights, not after. #hotels #traveltok #travelplanning #holidaytravel #budgettravel",
+      "image": null,
+      "publicImage": null
+    },
+    {
+      "id": "grp-ground",
+      "channel": "group",
+      "when": "2026-11-20T12:00:00-06:00",
+      "auto": false,
+      "skip": false,
+      "where": "A budget-travel or backpacking Facebook group whose rules allow sharing free tools (ask the admin first; don't post if they say no)",
+      "text": "Hi all. Before I post this I checked with the admin, since I made the tool.\n\nI built a free planner for multi-city trips that looks past flights. For each leg it shows a train, bus or ferry option where one runs (things like Guangzhou to Hong Kong by high-speed train, Seoul to Busan on the KTX, Athens to the islands by ferry), next to the flights, and it finds stays for your exact nights under a nightly cap. Train and ferry fares are typical fares, labeled as estimates.\n\nDisclosure: I made it, and some booking links are affiliate links (no change to your price). I'd really like to know which train or ferry routes you'd want added: https://routehound.pages.dev/?utm_source=group&utm_medium=community&utm_campaign=2026-11-16-beyond-flights-trains-ferries&utm_content=grp-ground",
+      "image": "ads/train-instead-square.jpg",
+      "publicImage": null
+    }
+  ]
+}
