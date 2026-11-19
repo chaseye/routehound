@@ -148,6 +148,95 @@
             "wait": 500
           }
         ]
+      },
+      {
+        "name": "tickets",
+        "path": "/",
+        "width": 610,
+        "height": 1320,
+        "steps": [
+          {
+            "click": "text=Load example trip"
+          },
+          {
+            "wait": 400
+          },
+          {
+            "click": "label[for=mode-deep]"
+          },
+          {
+            "wait": 300
+          },
+          {
+            "click": "text=Sniff out prices"
+          },
+          {
+            "wait": 6000
+          },
+          {
+            "scroll": "h2:has-text('Ticket strategies')"
+          },
+          {
+            "scrollBy": -165
+          },
+          {
+            "wait": 500
+          }
+        ]
+      },
+      {
+        "name": "comfort",
+        "path": "/",
+        "steps": [
+          {
+            "click": "text=Load example trip"
+          },
+          {
+            "wait": 400
+          },
+          {
+            "click": "text=Sniff out prices"
+          },
+          {
+            "wait": 4500
+          },
+          {
+            "scroll": "h3:has-text('Most comfort within budget')"
+          },
+          {
+            "scrollBy": -190
+          },
+          {
+            "wait": 500
+          }
+        ]
+      },
+      {
+        "name": "deep",
+        "path": "/",
+        "steps": [
+          {
+            "click": "text=Load example trip"
+          },
+          {
+            "wait": 400
+          },
+          {
+            "click": "label[for=mode-deep]"
+          },
+          {
+            "wait": 300
+          },
+          {
+            "scroll": "fieldset.modes"
+          },
+          {
+            "scrollBy": -200
+          },
+          {
+            "wait": 500
+          }
+        ]
       }
     ]
   }

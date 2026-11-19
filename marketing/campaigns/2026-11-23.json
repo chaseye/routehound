@@ -1,0 +1,279 @@
+{
+  "week": "2026-11-23",
+  "theme": "One ticket or four? How you book the trip matters",
+  "goal": "Trip searches from social and community links (UTM-tagged per post), and which lead angle gets more clicks: ticket strategies (one-ticket) or seat class within budget (comfort-budget).",
+  "why": "No results yet (the 11-09 and 11-16 branches were not merged and there is no marketing/results.md), so this week tests features the last two weeks never led with. Both ship today: 'Ticket strategies' compares one multi-city ticket (and, in Deep search, a round trip plus a cheap regional hop) with buying the same flights separately in the same seat class, with a plain warning to leave a buffer day on separate tickets; Smart picks include 'Most comfort within budget', which finds the highest seat class that keeps the whole trip under your budget; Deep search also tries nearby airports (Midway for O'Hare, Gimpo for Incheon, Shenzhen or Macau for Hong Kong). Black Friday (Nov 27) and Cyber Monday (Nov 30) fare sales are when people book winter and spring trips, often one leg at a time, so the honest timely message is: before you grab a sale fare for one leg, see how the whole trip prices as one ticket. No savings figures; every price shown is labeled as an example.",
+  "ads": [
+    {
+      "id": "one-ticket",
+      "layout": "phone",
+      "screen": "tickets",
+      "theme": "dark",
+      "headline": "One ticket or **four?**",
+      "sub": "In Deep search, see one multi-city ticket next to the same flights bought separately, same seat class.",
+      "cta": "Compare tickets",
+      "formats": [
+        "portrait",
+        "landscape",
+        "story"
+      ],
+      "focus": "35%"
+    },
+    {
+      "id": "comfort-budget",
+      "layout": "phone",
+      "screen": "comfort",
+      "theme": "light",
+      "headline": "More comfort, **within budget.**",
+      "sub": "Set one budget for the whole trip, stays included. See the highest seat class that fits.",
+      "cta": "Set your budget",
+      "formats": [
+        "portrait",
+        "story"
+      ],
+      "focus": "20%"
+    },
+    {
+      "id": "sale-check",
+      "layout": "statement",
+      "theme": "dark",
+      "badge": "Free to use",
+      "headline": "Sale fare? **Check the whole trip first.**",
+      "sub": "Each leg, one ticket for all the flights, nearby dates and trains where they run, with a reason per pick.",
+      "cta": "Check your trip",
+      "formats": [
+        "portrait",
+        "landscape",
+        "story"
+      ]
+    },
+    {
+      "id": "nearby-deep",
+      "layout": "list",
+      "screen": "deep",
+      "theme": "light",
+      "headline": "Deep search tries **what you'd forget.**",
+      "sub": "Switch on Deep search and RouteHound checks the options that are easy to skip.",
+      "bullets": [
+        "Nearby airports, like Midway for O'Hare",
+        "Every seat class side by side",
+        "Round trip + a cheap regional hop"
+      ],
+      "cta": "Go Deep",
+      "formats": [
+        "portrait"
+      ],
+      "focus": "47%"
+    }
+  ],
+  "posts": [
+    {
+      "id": "fb-oneticket",
+      "channel": "facebook",
+      "ad": "one-ticket",
+      "when": "2026-11-23T19:00:00-06:00",
+      "text": "Booking a trip with three or four flights? How you buy them can change the total.\n\nTurn on Deep search and RouteHound's Ticket strategies table puts one multi-city ticket for the whole trip next to the same flights bought separately, in the same seat class, so you can see which comes out lower for your dates. Sometimes it's the single ticket, sometimes it isn't.\n\nOne honest note it shows too: separate tickets aren't protected if one flight is late, so leave a buffer day.\n\nFree to use. Try it on the example trip: {link}\n\n(Some booking links are affiliate links. They don't change your price or the order of results.)"
+    },
+    {
+      "id": "fb-sale",
+      "channel": "facebook",
+      "ad": "sale-check",
+      "when": "2026-11-27T12:00:00-06:00",
+      "text": "Seeing Black Friday fare sales for a trip with more than one stop?\n\nBefore you book one leg, add the whole route to RouteHound. It checks each leg, one multi-city ticket for all the flights, nearby dates, and a train or ferry where one runs, and tells you in plain words which way makes the most sense.\n\nSale prices change fast, so the booking site's price is always the final one. {link}"
+    },
+    {
+      "id": "fb-deep",
+      "channel": "facebook",
+      "ad": "nearby-deep",
+      "when": "2026-11-29T19:00:00-06:00",
+      "text": "Three things RouteHound's Deep search tries that are easy to forget when you book by hand:\n\n1. Nearby airports: Midway instead of O'Hare, Gimpo instead of Incheon, Shenzhen or Macau instead of Hong Kong.\n2. Every seat class side by side, plus the highest class that fits your budget.\n3. A round trip to one city plus a cheap regional hop, compared with separate one-ways.\n\nIt's free to use, and every pick says what it changed from your plan. Planning ahead of Cyber Monday? {link}"
+    },
+    {
+      "id": "ig-oneticket",
+      "channel": "instagram",
+      "ad": "one-ticket",
+      "when": "2026-11-24T19:00:00-06:00",
+      "text": "One ticket or four?\n\nFor a multi-city trip, switch on Deep search and RouteHound compares one multi-city ticket with the same flights bought separately, same seat class, same dates. You see both totals side by side before you book. Prices in the demo are labeled as examples.\n\nTip it shows too: separate tickets aren't protected if one flight runs late, so leave a buffer day.\n\nFree to use. Link in bio.\n\n#multicitytrip #travelhacks #budgettravel #cheapflights #travelplanning #traveltips"
+    },
+    {
+      "id": "ig-comfort",
+      "channel": "instagram",
+      "ad": "comfort-budget",
+      "when": "2026-11-25T12:00:00-06:00",
+      "text": "Want more comfort on a big trip without blowing the budget?\n\nSet one budget for the whole trip, stays included, and RouteHound's 'Most comfort within budget' pick finds the highest seat class that still keeps the trip under it, with a plain reason. Prices in the demo are labeled as examples.\n\nLink in bio.\n\n#businessclass #travelhacks #budgettravel #longhaul #travelplanning #multicitytrip"
+    },
+    {
+      "id": "ig-sale",
+      "channel": "instagram",
+      "ad": "sale-check",
+      "when": "2026-11-28T11:00:00-06:00",
+      "text": "Fare sale weekend. Before you book one leg, check the whole trip.\n\nAdd every city and date to RouteHound: it compares each leg, one ticket for all the flights, nearby dates, and trains or ferries where they run, with a plain reason for each pick. The booking site's price is always the final one.\n\nLink in bio.\n\n#blackfriday #cybermonday #travelplanning #budgettravel #cheapflights #wintertravel"
+    },
+    {
+      "id": "li-tickets",
+      "channel": "linkedin",
+      "ad": "one-ticket",
+      "when": "2026-11-24T12:00:00-06:00",
+      "text": "A lesson from building RouteHound, my multi-city trip planner: a route is not the same thing as a set of tickets.\n\nMy first version found the cheapest flight on each leg and added them up. That misses how airlines actually price trips: the same four flights can cost a different amount as one multi-city ticket than as four separate ones, and a round trip to one city plus a short regional hop can differ again.\n\nSo RouteHound now searches the whole trip as one ticket too, and in Deep search shows a Ticket strategies table: each way of buying the trip, in the same seat class, next to buying every flight separately. Sometimes separate wins. The table just shows both.\n\nThe part I almost left out: separate tickets aren't protected if one flight is late. A tool that only shows the lower number would hide that, so the table says it plainly and suggests a buffer day. Showing the trade-off matters more than showing a bigger difference.\n\nIf you're booking a winter or spring trip with more than one stop during this week's sales, I'd value your feedback: {link}"
+    },
+    {
+      "id": "rd-alphabeta",
+      "channel": "reddit",
+      "ad": "one-ticket",
+      "where": "r/alphaandbetausers (a sub for getting early users and feedback; read the sidebar rules before posting, they could not be checked automatically. Post once, as yourself, and reply to every comment)",
+      "when": "2026-11-24T19:30:00-06:00",
+      "title": "[Web] I built a free multi-city trip planner that compares one multi-city ticket with buying each flight separately. Looking for feedback",
+      "text": "Hi all. I made RouteHound, a free web app for trips with more than one stop. You add every leg once, and it compares ways to book the whole trip (turn on Deep search for the full comparison): one multi-city ticket for all the flights versus each flight bought separately in the same seat class (and in Deep search, a round trip to one city plus a cheap regional hop). It also shows per-leg fares by day, trains or ferries where they run, and stays for your exact nights, then gives a few picks with a plain reason for each.\n\nWhat I'd love feedback on:\n- Is the Ticket strategies table easy to read, or does it need a one-line summary on top?\n- It warns that separate tickets aren't protected if a flight is late and suggests a buffer day. Is that enough, or should it be louder?\n- The 'Most comfort within budget' pick shows the highest seat class that keeps the whole trip under your budget. Useful, or confusing?\n\nThere's an example trip (Chicago, Seoul, Guangzhou, Hong Kong) if you don't want to type your own. When the site isn't connected to live price sources, every number is labeled as an example.\n\nDisclosure: I built it, and booking links are affiliate links (they don't change your price or the order of results). {link}"
+    },
+    {
+      "id": "tt-oneticket",
+      "channel": "tiktok",
+      "when": "2026-11-25T18:30:00-06:00",
+      "text": "One ticket or four? Check before you book a multi-city trip. Example prices in the video. #traveltok #travelhacks #multicitytrip #budgettravel #cheapflights",
+      "script": [
+        "0-2s: hook on screen: \"Booking 4 flights separately? Check this first\" over the RouteHound plan screen",
+        "2-5s: tap Load example trip (Chicago, Seoul, Guangzhou, Hong Kong), switch to Deep search, then Sniff out prices",
+        "5-10s: scroll to Ticket strategies and hold on the row 'One multi-city ticket for every flight' next to the 'vs separate tickets' column",
+        "10-13s: zoom on the note under the heading: separate tickets aren't protected if one is late, leave a buffer day",
+        "13-15s: takeaway on screen: \"Price the whole trip as one ticket before you buy legs one by one.\" End card: free to use, link in bio. Small label: example prices"
+      ]
+    },
+    {
+      "id": "tt-comfort",
+      "channel": "tiktok",
+      "when": "2026-11-28T18:00:00-06:00",
+      "text": "How much comfort fits your trip budget? Set it once and see. Example prices in the video. #businessclass #traveltok #travelhacks #budgettravel #longhaul",
+      "script": [
+        "0-2s: hook on screen: \"How much comfort does your budget buy?\" over the plan screen with the budget field",
+        "2-5s: load the example trip, show the 'Trip budget per person' field (example: 6500), tap Sniff out prices",
+        "5-10s: scroll to Smart picks and stop on the 'Most comfort within budget' card; open 'See the full plan' to show the seat class it picked",
+        "10-13s: point at the line under the total (flights and rides, stays, hours in transit)",
+        "13-15s: takeaway on screen: \"Set the budget once, see the comfiest plan that fits.\" End card: free to use, link in bio. Small label: example prices"
+      ]
+    },
+    {
+      "id": "grp-tickets",
+      "channel": "group",
+      "where": "A budget-travel or backpacking Facebook group whose rules allow sharing free tools (message the admin first and ask; don't post if they say no or the rules ban promotion)",
+      "when": "2026-11-29T12:00:00-06:00",
+      "text": "Hi all. I asked the admin before posting this, since I made the tool.\n\nA tip for anyone booking a multi-city trip in the sales this week: price the whole trip as one multi-city ticket before you buy legs one at a time. Sometimes one ticket comes out lower, sometimes separate tickets do. If you go separate, leave a buffer day between flights, because a missed connection on separate tickets usually isn't covered.\n\nI built a free planner, RouteHound, that does that comparison for you in its Deep search mode: one ticket versus separate tickets in the same seat class, plus fares by day, trains or ferries where they run, and stays for your dates. Prices are labeled as examples when it isn't connected to live data, and some booking links are affiliate links (they don't change your price).\n\nHappy to answer questions about booking multi-city trips either way. {link}"
+    }
+  ],
+  "videos": [
+    {
+      "id": "ticket-tour",
+      "intro": "one-ticket",
+      "outro": "sale-check",
+      "path": "/",
+      "steps": [
+        {
+          "click": "text=Load example trip"
+        },
+        {
+          "wait": 500
+        },
+        {
+          "scroll": "fieldset.modes"
+        },
+        {
+          "scrollBy": -200
+        },
+        {
+          "wait": 500
+        },
+        {
+          "click": "label[for=mode-deep]"
+        },
+        {
+          "wait": 800
+        },
+        {
+          "click": "text=Sniff out prices"
+        },
+        {
+          "wait": 2000
+        },
+        {
+          "scroll": "h2:has-text('Ticket strategies')"
+        },
+        {
+          "scrollBy": -170
+        },
+        {
+          "wait": 2400
+        },
+        {
+          "scroll": "th:has-text('vs separate')"
+        },
+        {
+          "scrollBy": -200
+        },
+        {
+          "wait": 2000
+        },
+        {
+          "scroll": "h2:has-text('Smart picks')"
+        },
+        {
+          "scrollBy": -170
+        },
+        {
+          "wait": 1800
+        }
+      ]
+    },
+    {
+      "id": "comfort-tour",
+      "intro": "comfort-budget",
+      "outro": "sale-check",
+      "path": "/",
+      "steps": [
+        {
+          "click": "text=Load example trip"
+        },
+        {
+          "wait": 700
+        },
+        {
+          "scroll": "#budget"
+        },
+        {
+          "scrollBy": -250
+        },
+        {
+          "wait": 1600
+        },
+        {
+          "click": "text=Sniff out prices"
+        },
+        {
+          "wait": 2500
+        },
+        {
+          "scroll": "h3:has-text('Most comfort within budget')"
+        },
+        {
+          "scrollBy": -190
+        },
+        {
+          "wait": 2200
+        },
+        {
+          "click": "article.pick:has(h3:has-text('Most comfort within budget')) summary"
+        },
+        {
+          "wait": 400
+        },
+        {
+          "scroll": "article.pick:has(h3:has-text('Most comfort within budget')) summary"
+        },
+        {
+          "scrollBy": -260
+        },
+        {
+          "wait": 2800
+        }
+      ]
+    }
+  ]
+}
