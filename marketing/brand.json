@@ -148,6 +148,90 @@
             "wait": 500
           }
         ]
+      },
+      {
+        "name": "entry",
+        "path": "/",
+        "steps": [
+          {
+            "click": "text=Load example trip"
+          },
+          {
+            "wait": 400
+          },
+          {
+            "click": ".tabs a[href='#entry']"
+          },
+          {
+            "wait": 300
+          },
+          {
+            "click": "#entry h2"
+          },
+          {
+            "scroll": "#entry h2"
+          },
+          {
+            "scrollBy": -170
+          },
+          {
+            "wait": 500
+          }
+        ]
+      },
+      {
+        "name": "deals",
+        "path": "/",
+        "steps": [
+          {
+            "click": ".tabs a[href='#deals']"
+          },
+          {
+            "wait": 300
+          },
+          {
+            "click": "#deals h2"
+          },
+          {
+            "scroll": "h3:has-text('Trip.com Rewards')"
+          },
+          {
+            "scrollBy": -190
+          },
+          {
+            "wait": 500
+          }
+        ]
+      },
+      {
+        "name": "explore",
+        "path": "/",
+        "steps": [
+          {
+            "click": "text=Load example trip"
+          },
+          {
+            "wait": 400
+          },
+          {
+            "click": ".tabs a[href='#explore']"
+          },
+          {
+            "wait": 300
+          },
+          {
+            "click": "#explore h2"
+          },
+          {
+            "scroll": "#explore h2"
+          },
+          {
+            "scrollBy": -170
+          },
+          {
+            "wait": 500
+          }
+        ]
       }
     ]
   }

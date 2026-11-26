@@ -1,0 +1,298 @@
+{
+  "week": "2026-11-30",
+  "theme": "Before you go: visas, perks and your stops",
+  "goal": "Clicks from UTM-tagged social and community links (by utm_content per post), and which landing tab pulls more of them: Visas & entry (posts linking to /#entry, angle entry-check: fb-entry, li-entry, grp-entry) or Deals & memberships (fb-perks linking to /#deals, angle perks). Instagram and TikTok go through the bio link, so they're compared by utm_source only.",
+  "why": "No results yet: the 11-09, 11-16 and 11-23 branches are unmerged, nothing has been posted, and there is no marketing/results.md, so this week tests a new angle instead of building on data. Three weeks led with price (whole trip, trains and stays, ticket strategies). None led with the three tabs that cover everything except the fare, and all three work without API keys. Visas & entry gives one card per country on the route: a dated summary for US passports, a 'Check before you go' or 'Nothing to apply for' tag, and links to the official site, the US State Dept and IATA. Other passports get the official links. Deals & memberships lists loyalty programs, cashback portals and fare-alert clubs, each with promo-code searches. Explore gives each stop its official tourism site, video and post searches on six platforms, and a family-friendly switch. Timing: Cyber Monday (Nov 30) is when winter-break and spring trips get booked. For the example route (Seoul, Guangzhou, Hong Kong in January 2027), the app's South Korea card notes K-ETA is needed from Jan 1, 2027, which is a real before-you-go check. Visa info is always framed the way the app frames it: a starting point to confirm on official sites. No savings figures. Any price shown is labeled as an example.",
+  "ads": [
+    {
+      "id": "entry-check",
+      "layout": "phone",
+      "screen": "entry",
+      "theme": "dark",
+      "headline": "Need a visa? **See each stop first.**",
+      "sub": "One card per country on your route, with links to the official sites. Always confirm before you fly.",
+      "cta": "Check your route",
+      "formats": [
+        "portrait",
+        "landscape",
+        "story"
+      ],
+      "focus": "66%"
+    },
+    {
+      "id": "perks",
+      "layout": "phone",
+      "screen": "deals",
+      "theme": "light",
+      "headline": "Loyalty and cashback, **one list.**",
+      "sub": "Member programs, cashback portals and fare-alert clubs. Some links earn us a commission.",
+      "cta": "See the list",
+      "formats": [
+        "portrait",
+        "story"
+      ],
+      "focus": "28%"
+    },
+    {
+      "id": "explore",
+      "layout": "phone",
+      "screen": "explore",
+      "theme": "dark",
+      "headline": "Get to know **each stop.**",
+      "sub": "Official tourism site plus video and post searches for every city, with a family-friendly switch.",
+      "cta": "Explore your stops",
+      "formats": [
+        "portrait"
+      ],
+      "focus": "55%"
+    },
+    {
+      "id": "before-you-go",
+      "layout": "list",
+      "screen": "entry",
+      "theme": "light",
+      "headline": "Before you go, **beyond the price.**",
+      "sub": "Three tabs built from the route you already planned. Free to use.",
+      "bullets": [
+        "Visas and entry for each country",
+        "Loyalty and cashback programs",
+        "Videos and guides for every stop"
+      ],
+      "cta": "Plan your trip",
+      "formats": [
+        "portrait",
+        "landscape",
+        "story"
+      ],
+      "focus": "67%"
+    }
+  ],
+  "posts": [
+    {
+      "id": "fb-entry",
+      "channel": "facebook",
+      "ad": "entry-check",
+      "when": "2026-11-30T19:00:00-06:00",
+      "text": "Booking a winter-break or spring trip in the Cyber Monday sales? Before you pay for the flights, check what each country on the route asks of you at the border.\n\nRouteHound's Visas & entry tab makes one card for every country on your trip, with a short summary for US passports (dated, so you know how fresh it is), a 'Check before you go' or 'Nothing to apply for' tag, and links to the official site, the US State Department and IATA's travel centre. Other passports get the official links.\n\nIt's a starting point, not the final word: always confirm on the official site before you book and again before you fly.\n\nFree to use. Add your route, search, then open Visas & entry: {link:/#entry}"
+    },
+    {
+      "id": "fb-perks",
+      "channel": "facebook",
+      "ad": "perks",
+      "when": "2026-12-02T12:00:00-06:00",
+      "text": "Found the trip? Before you book, see which loyalty program, cashback portal or member discount you could stack on it.\n\nRouteHound's Deals & memberships tab puts them in one list: hotel and booking-site loyalty programs, cashback portals, fare-alert clubs, and member travel desks like AAA and Costco Travel. Each one has a one-line note and quick searches for current promo codes.\n\nFree to use: {link:/#deals}\n\n(Some links in RouteHound are affiliate links. They don't change your price or the order of results.)"
+    },
+    {
+      "id": "fb-before",
+      "channel": "facebook",
+      "ad": "before-you-go",
+      "when": "2026-12-04T19:00:00-06:00",
+      "text": "Three things to check before a trip with several stops, besides the fare:\n\n1. Entry rules for every country. Some need an online authorization or an arrival form even when you don't need a visa.\n2. Loyalty and cashback programs you could stack on the booking.\n3. What each stop is like: the official tourism site, plus videos and posts from travelers.\n\nRouteHound has a tab for each: Visas & entry, Deals & memberships and Explore, built from the route you've already planned. Entry summaries are a starting point, so confirm on the official sites.\n\nFree to use: {link}\n\n(Some links are affiliate links; they never change your price or the order of results.)"
+    },
+    {
+      "id": "ig-entry",
+      "channel": "instagram",
+      "ad": "entry-check",
+      "when": "2026-12-01T19:00:00-06:00",
+      "text": "Visa, e-visa, travel authorization, arrival form? It depends on the country, and a multi-country trip can need a different one at each stop.\n\nPlan your route in RouteHound, then open Visas & entry: one card per country with a short summary for US passports and links to the official sites. Other passports get the official links. Treat it as your checklist and confirm each one on the official site before you book.\n\nFree to use. Link in bio.\n\n#travelchecklist #visatips #wintertravel #multicitytrip #budgettravel #travelplanning #traveltips"
+    },
+    {
+      "id": "ig-perks",
+      "channel": "instagram",
+      "ad": "perks",
+      "when": "2026-12-03T19:00:00-06:00",
+      "text": "The fare is one part. The program you book through is another.\n\nRouteHound's Deals & memberships tab lists loyalty programs, cashback portals and fare-alert clubs in one place, with a one-line note on each and quick links to search for current promo codes. Look through it before you book.\n\nFree to use. Link in bio. Some links are affiliate links; they don't change your price.\n\n#travelhacks #cashback #loyaltyprogram #budgettravel #travelplanning #pointsandmiles"
+    },
+    {
+      "id": "ig-explore",
+      "channel": "instagram",
+      "ad": "explore",
+      "when": "2026-12-05T11:00:00-06:00",
+      "text": "Booked Seoul, Guangzhou and Hong Kong? Now get to know them.\n\nRouteHound's Explore tab makes a card for each stop on your route: the official tourism site where there is one, quick searches for videos and posts on YouTube, TikTok, Instagram, Pinterest and more, and shortcuts for hidden gems, street food, on a budget and getting around. Flip on family-friendly results if the kids are coming.\n\nFree to use. Link in bio.\n\n#travelinspo #multicitytrip #familytravel #asiatravel #travelplanning #budgettravel"
+    },
+    {
+      "id": "li-entry",
+      "channel": "linkedin",
+      "ad": "entry-check",
+      "when": "2026-12-01T12:00:00-06:00",
+      "text": "A lesson from building RouteHound, my multi-city trip planner: the most useful thing for a traveler isn't always a price.\n\nI nearly left out the Visas & entry tab. Entry rules change, and a confident, out-of-date answer is worse than no answer. But people planning a trip through three or four countries were asking the same thing: what do I need for each stop?\n\nSo I built it around honesty instead of completeness:\n- Every summary is dated and says who it's for (US passports for now). Other passports get the official links, not a guess.\n- Each country gets a plain tag, 'Check before you go' or 'Nothing to apply for', and links to the official site, the US State Department and IATA's travel centre.\n- The page says it outright: confirm on the official site before you book and again before you fly.\n\nOne example from the sample route: for US passports, the South Korea card says K-ETA is needed from Jan 1, 2027. For anyone planning a winter-break trip through Seoul in January, that's worth knowing before the trip, not at the airport.\n\nThe broader lesson for me: when your data can go stale, show the date, show the source, and send people to the authority. Trust comes from that.\n\nIf you're planning a trip across several countries this winter or spring, I'd value your feedback: {link:/#entry}"
+    },
+    {
+      "id": "rd-imadethis",
+      "channel": "reddit",
+      "ad": "before-you-go",
+      "where": "r/IMadeThis (self-promotion sub where makers share software; verify rules before posting: the rules page could not be opened automatically, so read the sidebar and any flair or link rules first. Post once, as yourself, reply to every comment)",
+      "when": "2026-12-02T19:30:00-06:00",
+      "title": "I made a free trip planner for multi-country trips, and added a 'before you go' side: visas and entry per country, loyalty/cashback programs, and a page per stop",
+      "text": "I made RouteHound, a free web app for trips with several stops. You add every leg once and it prices the whole trip (flights, trains or ferries where they run, and stays), then gives a few picks with a plain reason for each.\n\nThis week I'm looking for feedback on the parts that aren't about price:\n\n- Visas & entry: one card per country on your route. For US passports there's a short dated summary and a 'Check before you go' or 'Nothing to apply for' tag. Every card links to the official site, the US State Dept and IATA's travel centre. Other passports get the links only, because I'd rather not guess.\n- Deals & memberships: loyalty programs, cashback portals and fare-alert clubs in one list, with quick promo-code searches.\n- Explore: for each stop, the official tourism site plus quick searches for videos and posts, with a family-friendly switch.\n\nQuestions I'd love answers to:\n1. Is 'confirm on the official site' clear enough on the entry cards, or should it be louder?\n2. Would summaries for other passports be worth it, given they go stale?\n3. Is a deals list useful, or just noise next to the trip itself?\n\nThere's an example trip (Chicago, Seoul, Guangzhou, Hong Kong) if you don't want to type your own. When it isn't connected to live price sources, every price is labeled as an example.\n\nDisclosure: I built this, and outbound booking and deal links can be affiliate links (they don't change your price or the order of results). {link}"
+    },
+    {
+      "id": "tt-entry",
+      "channel": "tiktok",
+      "when": "2026-12-02T18:30:00-06:00",
+      "text": "Multi-country trip? Check entry rules for every stop before you book. Summaries are a starting point; always confirm on the official site. Example trip and prices in the video. #traveltok #travelchecklist #visatips #wintertravel #multicitytrip #budgettravel",
+      "script": [
+        "Video: entry-tour (ad-maker render). 0-2s: hook on screen: \"3 countries, 3 different entry rules\" over the entry-check intro card",
+        "2-5s: screen recording: tap Load example trip (Chicago, Seoul, Guangzhou, Hong Kong) and show the route form (skip the price results; no savings figures on screen)",
+        "6-11s: tap the Visas & entry tab. Hold on the header line 'always confirm on the official site before you book and again before you fly', then the South Korea card ('K-ETA needed from Jan 1, 2027', tag 'Check before you go')",
+        "11-15s: scroll to Mainland China (visa or visa-free transit, 'Check before you go') and Hong Kong ('Nothing to apply for'). Point at the official-site, US State Dept and IATA chips",
+        "15-17s: takeaway on screen: \"Check each country before you book, then confirm on the official site.\" End card: free to use, link in bio"
+      ]
+    },
+    {
+      "id": "tt-before",
+      "channel": "tiktok",
+      "when": "2026-12-05T18:00:00-06:00",
+      "text": "Three tabs I check after the flights are sorted: entry rules, loyalty and cashback, and the stops themselves. Some links are affiliate links. #traveltok #travelhacks #travelchecklist #budgettravel #multicitytrip #travelplanning",
+      "script": [
+        "Video: before-tour (ad-maker render). 0-2s: hook on screen: \"Flights booked? Check these 3 things\" over the before-you-go intro card",
+        "2-6s: screen recording: tap Visas & entry, show the South Korea and Mainland China cards with their 'Check before you go' tags. Caption: confirm on official sites",
+        "6-10s: tap Deals & memberships and scroll through the Loyalty and Cashback cards (Trip.com Rewards, Klook, Rakuten). Caption: stack a program on your booking",
+        "10-14s: tap Explore and hold on the Seoul card: official tourism site, video and post links, Hidden gems and Street food shortcuts",
+        "14-16s: takeaway on screen: \"Plan the trip, then check entry, perks and your stops.\" End card: free to use, link in bio"
+      ]
+    },
+    {
+      "id": "grp-entry",
+      "channel": "group",
+      "where": "A budget-travel or backpacking Facebook group whose rules allow sharing free tools (message the admin first and ask; don't post if they say no or the rules ban promotion)",
+      "when": "2026-12-04T12:00:00-06:00",
+      "text": "Hi all. I asked the admin before posting this, since I made the tool I mention at the end.\n\nA tip for anyone who grabbed a sale fare for a winter-break or spring trip through several countries: check the entry rules for every stop now, not the week you fly. Some countries ask for an online travel authorization or an arrival form even when you don't need a visa, a few have rules that change on a set date, and transit rules can differ from tourist rules. The official immigration site for each country and IATA's travel centre are the places to confirm.\n\nI built a free planner, RouteHound, with a Visas & entry tab that makes a checklist from your route: one card per country with a short dated summary for US passports and links to the official sites (other passports get the links). It's a starting point, so please still confirm on the official sites. Some booking links in it are affiliate links; they don't change your price.\n\nHappy to help anyone work out what their route needs, tool or no tool. {link:/#entry}"
+    }
+  ],
+  "videos": [
+    {
+      "id": "entry-tour",
+      "intro": "entry-check",
+      "outro": "before-you-go",
+      "path": "/",
+      "steps": [
+        {
+          "click": "text=Load example trip"
+        },
+        {
+          "wait": 1800
+        },
+        {
+          "scrollBy": -6000
+        },
+        {
+          "wait": 300
+        },
+        {
+          "click": ".tabs a[href='#entry']"
+        },
+        {
+          "wait": 100
+        },
+        {
+          "click": "#entry h2"
+        },
+        {
+          "scroll": "#entry h2"
+        },
+        {
+          "scrollBy": -170
+        },
+        {
+          "wait": 3000
+        },
+        {
+          "scroll": "#entry-list h3:has-text('South Korea')"
+        },
+        {
+          "scrollBy": -190
+        },
+        {
+          "wait": 2200
+        },
+        {
+          "scroll": "#entry-list h3:has-text('Mainland China')"
+        },
+        {
+          "scrollBy": -190
+        },
+        {
+          "wait": 2200
+        },
+        {
+          "scroll": "#entry-list h3:has-text('Hong Kong')"
+        },
+        {
+          "scrollBy": -190
+        },
+        {
+          "wait": 2000
+        }
+      ]
+    },
+    {
+      "id": "before-tour",
+      "intro": "before-you-go",
+      "outro": "perks",
+      "path": "/",
+      "steps": [
+        {
+          "click": "text=Load example trip"
+        },
+        {
+          "wait": 500
+        },
+        {
+          "click": ".tabs a[href='#entry']"
+        },
+        {
+          "wait": 300
+        },
+        {
+          "click": "#entry h2"
+        },
+        {
+          "scroll": "#entry h2"
+        },
+        {
+          "scrollBy": -170
+        },
+        {
+          "wait": 2400
+        },
+        {
+          "click": ".tabs a[href='#deals']"
+        },
+        {
+          "wait": 300
+        },
+        {
+          "click": "#deals h2"
+        },
+        {
+          "scroll": "#deal-list h3:has-text('Trip.com Rewards')"
+        },
+        {
+          "scrollBy": -190
+        },
+        {
+          "wait": 2400
+        },
+        {
+          "click": ".tabs a[href='#explore']"
+        },
+        {
+          "wait": 300
+        },
+        {
+          "click": "#explore h2"
+        },
+        {
+          "scroll": "#explore h2"
+        },
+        {
+          "scrollBy": -170
+        },
+        {
+          "wait": 2600
+        }
+      ]
+    }
+  ]
+}
